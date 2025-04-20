@@ -49,8 +49,9 @@ For testing different times of day, you can use environment variables to control
    cp .env.example .env
    ```
 
-2. Edit the `.env` file to set:
-   - `VITE_MOCK_TIME`: A specific ISO-format time (e.g., `2025-04-20T12:30:00Z` for 12:30 PM on Easter)
+2. Edit the `.env` file to set one of the following:
+   - `VITE_MOCK_TIME`: Set specific date AND time (e.g., `2025-04-20T12:30:00Z` for 12:30 PM on Easter)
+   - `VITE_MOCK_DATE`: Set only the date but use real time (e.g., `2025-04-20` for Easter day)
 
 3. Enable debug mode to see the current simulated time:
    ```

@@ -34,20 +34,24 @@ export const getEasterDate = (year: number): Date => {
 interface GetCurrentTimeFunction {
   (): Date;
   hasLoggedMockTime: boolean;
+  hasLoggedMockDate: boolean;
   hasLoggedError: boolean;
 }
 
 export const getCurrentTime = ((): GetCurrentTimeFunction => {
   const func = (): Date => {
-  // Check for testing override via environment variable
-  let mockTimeString;
+  // Check for testing overrides via environment variables
+  let mockTimeString, mockDateString;
   try {
-    // @ts-ignore
+    // @ts-ignore - Check for full time override
     mockTimeString = import.meta.env?.VITE_MOCK_TIME;
+    // @ts-ignore - Check for date-only override
+    mockDateString = import.meta.env?.VITE_MOCK_DATE;
   } catch (e) {
-    // No mock time available
+    // No mock values available
   }
   
+  // VITE_MOCK_TIME takes precedence over VITE_MOCK_DATE
   if (mockTimeString) {
     try {
       // Parse ISO format YYYY-MM-DDTHH:MM:SS
@@ -75,6 +79,49 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
         getCurrentTime.hasLoggedError = true;
       }
     }
+  } 
+  // If no VITE_MOCK_TIME but VITE_MOCK_DATE is specified
+  else if (mockDateString) {
+    try {
+      // Get current time
+      const now = new Date();
+      
+      // Parse date format YYYY-MM-DD
+      const mockDate = new Date(mockDateString);
+      
+      // Validate that the date is valid
+      if (!isNaN(mockDate.getTime())) {
+        // Create a date with mock date but current time
+        const hybridTime = new Date(
+          mockDate.getFullYear(),
+          mockDate.getMonth(),
+          mockDate.getDate(),
+          now.getHours(),
+          now.getMinutes(),
+          now.getSeconds(),
+          now.getMilliseconds()
+        );
+        
+        // Only log once when the app starts
+        if (!getCurrentTime.hasLoggedMockDate) {
+          console.log(`Using mock date with real time: ${hybridTime.toISOString()}`);
+          getCurrentTime.hasLoggedMockDate = true;
+        }
+        return hybridTime;
+      } else {
+        // Only log error once
+        if (!getCurrentTime.hasLoggedError) {
+          console.error(`Invalid mock date format: ${mockDateString}, using real date instead`);
+          getCurrentTime.hasLoggedError = true;
+        }
+      }
+    } catch (error) {
+      // Only log error once
+      if (!getCurrentTime.hasLoggedError) {
+        console.error(`Error parsing mock date: ${error}`);
+        getCurrentTime.hasLoggedError = true;
+      }
+    }
   }
   
   // Default to actual current time
@@ -83,6 +130,7 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
   
   // Add static properties
   func.hasLoggedMockTime = false;
+  func.hasLoggedMockDate = false;
   func.hasLoggedError = false;
   
   return func;

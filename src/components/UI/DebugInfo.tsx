@@ -45,7 +45,7 @@ const DebugInfo = () => {
         </div>
       )}
       <div className="text-gray-300 text-xs mt-1">
-        Set VITE_MOCK_TIME in .env to override
+        Set VITE_MOCK_TIME or VITE_MOCK_DATE in .env to override
       </div>
     </div>
   );
