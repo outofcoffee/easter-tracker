@@ -40,6 +40,23 @@ npm install
 npm run dev
 ```
 
+### Testing with Mock Time
+
+For testing different times of day, you can use environment variables to control the Easter Bunny's position:
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file to set:
+   - `VITE_MOCK_TIME`: A specific ISO-format time (e.g., `2025-04-20T12:30:00Z` for 12:30 PM on Easter)
+
+3. Enable debug mode to see the current simulated time:
+   ```
+   VITE_DEBUG=true
+   ```
+
 ### Build for Production
 
 ```bash

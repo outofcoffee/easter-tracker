@@ -59,20 +59,22 @@ export const calculateCurrentPosition = async (): Promise<BunnyPosition | null> 
   try {
     const cities = await getCities();
     
-    // Easter Sunday 2025 is April 20
+    // Get the simulated time from our timeUtils
+    const { getSimulatedTime } = await import('./timeUtils');
+    const simulatedTime = getSimulatedTime();
+    
+    // Easter date (April 20, 2025)
     const easterDate = new Date('2025-04-20T00:00:00Z');
-    const now = new Date();
     
-    // For testing purposes, we'll scale a full day to the current time within the current day
-    // In production, you'd use the actual Easter date
-    const startOfDay = new Date(now);
-    startOfDay.setHours(0, 0, 0, 0);
+    // Extract just the time portion for calculating progress through the day
+    const startOfEaster = new Date(easterDate);
+    startOfEaster.setHours(0, 0, 0, 0);
     
-    const endOfDay = new Date(now);
-    endOfDay.setHours(23, 59, 59, 999);
+    const endOfEaster = new Date(easterDate);
+    endOfEaster.setHours(23, 59, 59, 999);
     
-    const totalDayMs = endOfDay.getTime() - startOfDay.getTime();
-    const elapsedMs = now.getTime() - startOfDay.getTime();
+    const totalDayMs = endOfEaster.getTime() - startOfEaster.getTime();
+    const elapsedMs = simulatedTime.getTime() - startOfEaster.getTime();
     const progress = Math.min(1, Math.max(0, elapsedMs / totalDayMs));
     
     const totalCities = cities.length;

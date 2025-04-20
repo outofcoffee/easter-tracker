@@ -32,7 +32,7 @@ export const getEasterDate = (year: number): Date => {
 
 // Check if today is Easter
 export const isEaster = (): boolean => {
-  const today = new Date();
+  const today = getCurrentTime();
   const easter = getEasterDate(today.getFullYear());
   
   return (
@@ -42,16 +42,42 @@ export const isEaster = (): boolean => {
   );
 };
 
+// Get current time, possibly overridden for testing
+export const getCurrentTime = (): Date => {
+  // Check for testing override via environment variable
+  const mockTimeString = import.meta.env.VITE_MOCK_TIME;
+  
+  if (mockTimeString) {
+    try {
+      // Parse ISO format YYYY-MM-DDTHH:MM:SS
+      const mockTime = new Date(mockTimeString);
+      
+      // Validate that the date is valid
+      if (!isNaN(mockTime.getTime())) {
+        console.log(`Using mock time: ${mockTime.toISOString()}`);
+        return mockTime;
+      } else {
+        console.error(`Invalid mock time format: ${mockTimeString}, using real time instead`);
+      }
+    } catch (error) {
+      console.error(`Error parsing mock time: ${error}`);
+    }
+  }
+  
+  // Default to actual current time
+  return new Date();
+};
+
 // For development, we simulate the progression of Easter day 
 // by mapping the current time to the equivalent time on Easter day
 export const getSimulatedTime = (): Date => {
   // If it's actually Easter, use the real time
   if (isEaster()) {
-    return new Date();
+    return getCurrentTime();
   }
   
   // Otherwise, map the current time of day to a simulated Easter time
-  const now = new Date();
+  const now = getCurrentTime();
   const easterDate = getEasterDate(2025); // Use 2025 Easter
   
   // Create a simulated time that maps today's progress through the day
@@ -64,12 +90,12 @@ export const getSimulatedTime = (): Date => {
   
   const totalDayMs = endOfToday.getTime() - startOfToday.getTime();
   const elapsedMs = now.getTime() - startOfToday.getTime();
-  const progress = elapsedMs / totalDayMs;
+  const todayProgress = elapsedMs / totalDayMs;
   
   // Map this progress to Easter day
   const simulatedEaster = new Date(easterDate);
   simulatedEaster.setHours(0, 0, 0, 0);
-  simulatedEaster.setTime(simulatedEaster.getTime() + progress * 24 * 60 * 60 * 1000);
+  simulatedEaster.setTime(simulatedEaster.getTime() + todayProgress * 24 * 60 * 60 * 1000);
   
   return simulatedEaster;
 };

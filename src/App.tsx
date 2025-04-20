@@ -4,6 +4,7 @@ import Footer from './components/UI/Footer';
 import Map from './components/Map/Map';
 import ProgressTracker from './components/ProgressTracker/ProgressTracker';
 import LocationInfo from './components/LocationInfo/LocationInfo';
+import DebugInfo from './components/UI/DebugInfo';
 import { useTracker } from './context/TrackerContext';
 import { getRandomFact } from './data/easterFacts';
 
@@ -85,6 +86,7 @@ function App() {
       </main>
       
       <Footer />
+      <DebugInfo />
     </div>
   );
 }

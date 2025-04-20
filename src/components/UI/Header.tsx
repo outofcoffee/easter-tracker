@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { formatTime } from '../../utils/timeUtils';
+import { formatTime, getCurrentTime } from '../../utils/timeUtils';
 
 const Header = () => {
-  // Update time every second
-  const [time, setTime] = useState(new Date());
+  // Update time every second using current time (real or mocked)
+  const [time, setTime] = useState(getCurrentTime());
   
   useEffect(() => {
     const interval = setInterval(() => {
-      setTime(new Date());
+      setTime(getCurrentTime());
     }, 1000);
     
     return () => clearInterval(interval);
