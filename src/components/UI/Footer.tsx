@@ -5,7 +5,7 @@ const Footer = () => {
         Happy Easter! 🐰 {new Date().getFullYear()}
       </p>
       <p className="mt-1">
-        This is a fun educational project tracking the Easter Bunny's imaginary journey.
+        This is a fun educational project tracking the Easter Bunny's journey.
       </p>
     </footer>
   );

@@ -135,14 +135,41 @@ export const getUserNearestCity = async (
 };
 
 // Calculate arrival time for a specific city
-export const calculateArrivalTime = (city: City): string => {
+export const calculateArrivalTime = async (city: City): Promise<string> => {
   // Easter Sunday 2025 is April 20
   const easterDate = new Date('2025-04-20T00:00:00Z');
-  const cities = getCities();
+  const cities = await getCities();
   
   // Find the index of the city in our journey
   const cityIndex = cities.findIndex(c => c.id === city.id);
-  if (cityIndex === -1) return 'Unknown';
+  if (cityIndex === -1) {
+    // If not found in the sorted list, find the nearest city
+    const sortedCities = cities;
+    let nearestIndex = 0;
+    let minDistance = Number.MAX_VALUE;
+    
+    for (let i = 0; i < sortedCities.length; i++) {
+      const distance = calculateDistance(
+        city.latitude,
+        city.longitude,
+        sortedCities[i].latitude,
+        sortedCities[i].longitude
+      );
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestIndex = i;
+      }
+    }
+    
+    // Use the nearest city's index for calculation
+    const dayInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const msPerCity = dayInMs / sortedCities.length;
+    const arrivalTimeMs = easterDate.getTime() + (nearestIndex * msPerCity);
+    
+    const arrivalTime = new Date(arrivalTimeMs);
+    return arrivalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
   
   // Calculate what time the bunny will arrive at this city
   const totalCities = cities.length;
