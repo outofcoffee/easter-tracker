@@ -1,7 +1,6 @@
 // Setup file for tests
 // This will be executed before each test file
 import { vi } from 'vitest';
-import React from 'react';
 
 // Mock for Leaflet
 vi.mock('leaflet', () => {
@@ -30,11 +29,16 @@ vi.mock('leaflet', () => {
 
 // Mock for react-leaflet
 vi.mock('react-leaflet', () => {
+  // @ts-ignore
+  const mockChildren = ({ children }: { children: any }) => {
+    return { children };
+  };
+  
   return {
-    MapContainer: vi.fn().mockImplementation(({ children }) => <div>{children}</div>),
-    TileLayer: vi.fn().mockImplementation(() => <div />),
-    Marker: vi.fn().mockImplementation(({ children }) => <div>{children}</div>),
-    Popup: vi.fn().mockImplementation(({ children }) => <div>{children}</div>),
+    MapContainer: vi.fn().mockImplementation(mockChildren),
+    TileLayer: vi.fn().mockImplementation(() => ({})),
+    Marker: vi.fn().mockImplementation(mockChildren),
+    Popup: vi.fn().mockImplementation(mockChildren),
     useMap: vi.fn().mockReturnValue({
       setView: vi.fn(),
       getZoom: vi.fn().mockReturnValue(10)

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { calculateCurrentPosition } from '../utils/geoUtils';
 import { calculateBasketsDelivered } from '../utils/basketCalculator';
 import { BunnyPosition, ViewerLocation } from '../types';
+import { isEaster, getNextEasterDate, formatDate } from '../utils/timeUtils';
 
 interface TrackerContextType {
   currentPosition: BunnyPosition | null;
@@ -11,6 +12,9 @@ interface TrackerContextType {
   viewerLocation: ViewerLocation | null;
   estimatedArrivalTime: string | null;
   isNearby: boolean;
+  isEasterDay: boolean;
+  nextEasterDate: Date;
+  nextEasterFormatted: string;
 }
 
 const defaultContext: TrackerContextType = {
@@ -20,7 +24,10 @@ const defaultContext: TrackerContextType = {
   completionPercentage: 0,
   viewerLocation: null,
   estimatedArrivalTime: null,
-  isNearby: false
+  isNearby: false,
+  isEasterDay: false,
+  nextEasterDate: getNextEasterDate(),
+  nextEasterFormatted: formatDate(getNextEasterDate())
 };
 
 const TrackerContext = createContext<TrackerContextType>(defaultContext);
@@ -39,9 +46,41 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
   const [viewerLocation, setViewerLocation] = useState<ViewerLocation | null>(null);
   const [estimatedArrivalTime, setEstimatedArrivalTime] = useState<string | null>(null);
   const [isNearby, setIsNearby] = useState(false);
+  const [isEasterDay, setIsEasterDay] = useState(isEaster());
+  const [nextEasterDate, setNextEasterDate] = useState(getNextEasterDate());
+  const [nextEasterFormatted, setNextEasterFormatted] = useState(formatDate(getNextEasterDate()));
 
-  // Update bunny position every second
+  // Check if it's Easter Day and update relevant information
   useEffect(() => {
+    const checkEaster = () => {
+      // Update Easter status
+      const easterDay = isEaster();
+      setIsEasterDay(easterDay);
+      
+      // Update next Easter date if needed
+      const nextEaster = getNextEasterDate();
+      setNextEasterDate(nextEaster);
+      setNextEasterFormatted(formatDate(nextEaster));
+    };
+    
+    // Check initially
+    checkEaster();
+    
+    // Check periodically (every minute is enough for date changes)
+    const interval = setInterval(checkEaster, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Update bunny position every second (only on Easter)
+  useEffect(() => {
+    // If it's not Easter, don't track position
+    if (!isEasterDay) {
+      setCurrentPosition(null);
+      setCompletionPercentage(0);
+      setBasketsDelivered(0);
+      return;
+    }
+    
     const updatePosition = async () => {
       const position = await calculateCurrentPosition();
       
@@ -60,8 +99,10 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
           setIsNearby(isNear);
           
           if (!estimatedArrivalTime && viewerLocation.nearestCity) {
-            // TODO: Calculate estimated arrival time based on journey
-            setEstimatedArrivalTime('Coming soon!');
+            // Calculate estimated arrival time based on journey
+            const { calculateArrivalTime } = await import('../utils/geoUtils');
+            const arrivalTime = await calculateArrivalTime(viewerLocation.nearestCity);
+            setEstimatedArrivalTime(arrivalTime);
           }
         }
       }
@@ -71,7 +112,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
     const interval = setInterval(updatePosition, 1000);
     
     return () => clearInterval(interval);
-  }, [viewerLocation, estimatedArrivalTime]);
+  }, [viewerLocation, estimatedArrivalTime, isEasterDay]);
 
   // Get viewer's location ONCE at startup
   useEffect(() => {
@@ -155,7 +196,10 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
       completionPercentage,
       viewerLocation,
       estimatedArrivalTime,
-      isNearby
+      isNearby,
+      isEasterDay,
+      nextEasterDate,
+      nextEasterFormatted
     }}>
       {children}
     </TrackerContext.Provider>

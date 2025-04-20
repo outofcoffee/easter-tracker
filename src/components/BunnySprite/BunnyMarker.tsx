@@ -21,7 +21,8 @@ interface BunnyMarkerProps {
 const BunnyMarker: React.FC<BunnyMarkerProps> = ({ position }) => {
   const { currentPosition } = useTracker();
   const [fact, setFact] = useState(getRandomFact());
-  const [animationState, setAnimationState] = useState(BunnyAnimationState.HOPPING);
+  // Track animation state 
+  const [_animationState, setAnimationState] = useState(BunnyAnimationState.HOPPING);
   
   // Update animation state based on bunny's progress
   useEffect(() => {

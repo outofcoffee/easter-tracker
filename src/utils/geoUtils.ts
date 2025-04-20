@@ -1,4 +1,4 @@
-import { City, BunnyPosition, ViewerLocation } from '../types';
+import { City, BunnyPosition } from '../types';
 import { getCities } from '../data/cities';
 
 // Calculate distance between two points using Haversine formula
@@ -59,23 +59,17 @@ export const calculateCurrentPosition = async (): Promise<BunnyPosition | null> 
   try {
     const cities = await getCities();
     
-    // Get the simulated time from our timeUtils
-    const { getSimulatedTime } = await import('./timeUtils');
-    const simulatedTime = getSimulatedTime();
+    // Import time utilities
+    const { isEaster, getEasterDayProgress } = await import('./timeUtils');
     
-    // Easter date (April 20, 2025)
-    const easterDate = new Date('2025-04-20T00:00:00Z');
+    // If it's not Easter, return null
+    if (!isEaster()) {
+      return null;
+    }
     
-    // Extract just the time portion for calculating progress through the day
-    const startOfEaster = new Date(easterDate);
-    startOfEaster.setHours(0, 0, 0, 0);
-    
-    const endOfEaster = new Date(easterDate);
-    endOfEaster.setHours(23, 59, 59, 999);
-    
-    const totalDayMs = endOfEaster.getTime() - startOfEaster.getTime();
-    const elapsedMs = simulatedTime.getTime() - startOfEaster.getTime();
-    const progress = Math.min(1, Math.max(0, elapsedMs / totalDayMs));
+    // Get the progress through Easter day (0-100)
+    const progressPercent = getEasterDayProgress();
+    const progress = progressPercent / 100;
     
     const totalCities = cities.length;
     const visitedCitiesFloat = progress * totalCities;

@@ -30,6 +30,64 @@ export const getEasterDate = (year: number): Date => {
   return new Date(year, month - 1, day);
 };
 
+// Get current time, possibly overridden for testing
+interface GetCurrentTimeFunction {
+  (): Date;
+  hasLoggedMockTime: boolean;
+  hasLoggedError: boolean;
+}
+
+export const getCurrentTime = ((): GetCurrentTimeFunction => {
+  const func = (): Date => {
+  // Check for testing override via environment variable
+  let mockTimeString;
+  try {
+    // @ts-ignore
+    mockTimeString = import.meta.env?.VITE_MOCK_TIME;
+  } catch (e) {
+    // No mock time available
+  }
+  
+  if (mockTimeString) {
+    try {
+      // Parse ISO format YYYY-MM-DDTHH:MM:SS
+      const mockTime = new Date(mockTimeString);
+      
+      // Validate that the date is valid
+      if (!isNaN(mockTime.getTime())) {
+        // Only log once when the app starts
+        if (!getCurrentTime.hasLoggedMockTime) {
+          console.log(`Using mock time: ${mockTime.toISOString()}`);
+          getCurrentTime.hasLoggedMockTime = true;
+        }
+        return mockTime;
+      } else {
+        // Only log error once
+        if (!getCurrentTime.hasLoggedError) {
+          console.error(`Invalid mock time format: ${mockTimeString}, using real time instead`);
+          getCurrentTime.hasLoggedError = true;
+        }
+      }
+    } catch (error) {
+      // Only log error once
+      if (!getCurrentTime.hasLoggedError) {
+        console.error(`Error parsing mock time: ${error}`);
+        getCurrentTime.hasLoggedError = true;
+      }
+    }
+  }
+  
+  // Default to actual current time
+  return new Date();
+  };
+  
+  // Add static properties
+  func.hasLoggedMockTime = false;
+  func.hasLoggedError = false;
+  
+  return func;
+})();
+
 // Check if today is Easter
 export const isEaster = (): boolean => {
   const today = getCurrentTime();
@@ -42,60 +100,50 @@ export const isEaster = (): boolean => {
   );
 };
 
-// Get current time, possibly overridden for testing
-export const getCurrentTime = (): Date => {
-  // Check for testing override via environment variable
-  const mockTimeString = import.meta.env.VITE_MOCK_TIME;
-  
-  if (mockTimeString) {
-    try {
-      // Parse ISO format YYYY-MM-DDTHH:MM:SS
-      const mockTime = new Date(mockTimeString);
-      
-      // Validate that the date is valid
-      if (!isNaN(mockTime.getTime())) {
-        console.log(`Using mock time: ${mockTime.toISOString()}`);
-        return mockTime;
-      } else {
-        console.error(`Invalid mock time format: ${mockTimeString}, using real time instead`);
-      }
-    } catch (error) {
-      console.error(`Error parsing mock time: ${error}`);
-    }
-  }
-  
-  // Default to actual current time
-  return new Date();
+// Format a date nicely with month name
+export const formatDate = (date: Date): string => {
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 };
 
-// For development, we simulate the progression of Easter day 
-// by mapping the current time to the equivalent time on Easter day
-export const getSimulatedTime = (): Date => {
-  // If it's actually Easter, use the real time
-  if (isEaster()) {
-    return getCurrentTime();
+// Get the next Easter date
+export const getNextEasterDate = (): Date => {
+  const now = getCurrentTime();
+  const currentYear = now.getFullYear();
+  const easterThisYear = getEasterDate(currentYear);
+  
+  // If Easter has passed this year or it's not today, look to next year
+  if (now > easterThisYear && !isEaster()) {
+    return getEasterDate(currentYear + 1);
   }
   
-  // Otherwise, map the current time of day to a simulated Easter time
+  // Otherwise, return this year's Easter
+  return easterThisYear;
+};
+
+// Calculate the completion percentage for Easter day
+export const getEasterDayProgress = (): number => {
   const now = getCurrentTime();
-  const easterDate = getEasterDate(2025); // Use 2025 Easter
   
-  // Create a simulated time that maps today's progress through the day
-  // to the same progress through Easter day
-  const startOfToday = new Date(now);
-  startOfToday.setHours(0, 0, 0, 0);
+  // If it's not Easter, return 0 progress
+  if (!isEaster()) {
+    return 0;
+  }
   
-  const endOfToday = new Date(now);
-  endOfToday.setHours(23, 59, 59, 999);
+  // Calculate progress through the day
+  const startOfDay = new Date(now);
+  startOfDay.setHours(0, 0, 0, 0);
   
-  const totalDayMs = endOfToday.getTime() - startOfToday.getTime();
-  const elapsedMs = now.getTime() - startOfToday.getTime();
-  const todayProgress = elapsedMs / totalDayMs;
+  const endOfDay = new Date(now);
+  endOfDay.setHours(23, 59, 59, 999);
   
-  // Map this progress to Easter day
-  const simulatedEaster = new Date(easterDate);
-  simulatedEaster.setHours(0, 0, 0, 0);
-  simulatedEaster.setTime(simulatedEaster.getTime() + todayProgress * 24 * 60 * 60 * 1000);
+  const totalDayMs = endOfDay.getTime() - startOfDay.getTime();
+  const elapsedMs = now.getTime() - startOfDay.getTime();
   
-  return simulatedEaster;
+  // Return percentage (0-100)
+  return (elapsedMs / totalDayMs) * 100;
 };
