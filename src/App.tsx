@@ -54,7 +54,7 @@ function App() {
     <div className="min-h-screen flex flex-col bg-easter-blue/20">
       <Header />
       
-      <main className="flex-1 container mx-auto p-4">
+      <main className="flex-1 container mx-auto p-4 pb-8">
         {isEasterDay ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Sidebar with stats */}
@@ -72,12 +72,14 @@ function App() {
             </div>
             
             {/* Main map area */}
-            <div className="lg:col-span-3 h-[500px]">
-              <Map />
+            <div className="lg:col-span-3 flex flex-col">
+              <div className="h-[500px] mb-4">
+                <Map />
+              </div>
               
               {/* Current location banner */}
               {currentPosition?.currentCity && (
-                <div className="mt-4 bg-easter-pink text-white p-3 rounded-lg text-center animate-pulse">
+                <div className="mb-8 bg-easter-pink text-white p-3 rounded-lg text-center animate-pulse">
                   <p className="font-bold">
                     The Easter Bunny is currently in {currentPosition.currentCity.name}, {currentPosition.currentCity.country}!
                   </p>

@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 p-4 text-center text-gray-600 text-sm">
+    <footer className="bg-gray-100 p-4 mt-4 text-center text-gray-600 text-sm">
       <p>
         Happy Easter! 🐰 {new Date().getFullYear()}
       </p>
