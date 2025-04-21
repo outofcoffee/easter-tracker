@@ -15,7 +15,7 @@ A web application that tracks the Easter Bunny's journey on Easter day (April 20
 
 ## Core Features
 
-### 1. Map Visualization
+### 1. Map Visualisation
 - Interactive world map using Leaflet.js
 - Custom Easter-themed map style
 - Responsive design for all devices
@@ -49,7 +49,7 @@ A web application that tracks the Easter Bunny's journey on Easter day (April 20
 - Special notification when bunny is nearby
 
 ### 7. Child-Friendly UI
-- Bright, colorful design
+- Bright, colourful design
 - Simple language and explanations
 - Easter-themed decorations and animations
 - Fun facts about Easter traditions worldwide
@@ -111,24 +111,24 @@ eastertracker/
 1. Design and implement bunny sprite animation
 2. Add smooth path transitions
 3. Implement location details display
-4. Create progress visualization
+4. Create progress visualisation
 
-### Phase 4: User Location & Personalization
+### Phase 4: User Location & Personalisation
 1. Add geolocation detection
 2. Implement nearest city calculation
 3. Create local arrival time estimation
 4. Add special "nearby" notifications
 
-### Phase 5: Polish & Optimization
+### Phase 5: Polish & Optimisation
 1. Refine UI/UX for child-friendliness
 2. Add Easter-themed decorations
-3. Optimize for performance
+3. Optimise for performance
 4. Add loading states and error handling
 5. Test across devices and browsers
 
 ## Key Technical Challenges
 
-1. **Global City Database**: Creating a comprehensive but optimized list of worldwide cities
+1. **Global City Database**: Creating a comprehensive but optimised list of worldwide cities
 2. **Time-Based Positioning**: Calculating the bunny's position based on current time
 3. **Smooth Animation**: Ensuring fluid movement along the journey path
 4. **Performance**: Keeping the application responsive with animations and map rendering

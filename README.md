@@ -7,8 +7,8 @@ A fun, interactive web application that tracks the Easter Bunny's journey around
 - 🗺️ Real-time tracking of the Easter Bunny on an interactive world map
 - 🏙️ Journey through major cities around the world
 - 🧺 Live counter of Easter baskets delivered
-- 📍 Personalized arrival time based on your location
-- 🎨 Child-friendly, colorful design
+- 📍 Personalised arrival time based on your location
+- 🎨 Child-friendly, colourful design
 - 🌎 Educational Easter facts from around the world
 
 ## Technology Stack

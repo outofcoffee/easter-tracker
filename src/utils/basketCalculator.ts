@@ -13,5 +13,5 @@ export const calculateBasketsDelivered = (completionPercentage: number): number 
 
 // Format large numbers with commas
 export const formatNumber = (num: number): string => {
-  return num.toLocaleString('en-US');
+  return num.toLocaleString('en-GB');
 };
