@@ -25,8 +25,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
+      
+      - name: Verify Node.js version
+        run: |
+          echo "Node.js version:"
+          node --version
+          if [[ $(node --version) < "v22" ]]; then
+            echo "Error: Required Node.js v22 or higher"
+            exit 1
+          fi
       
       - name: Install dependencies
         run: npm ci

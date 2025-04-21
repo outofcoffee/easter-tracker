@@ -27,8 +27,14 @@ Check out the Easter Bunny Tracker live at: [https://outofcoffee.github.io/easte
 
 ### Prerequisites
 
-- Node.js (v16 or newer)
+- Node.js (v22 or newer)
 - npm
+
+If you use Node Version Manager (nvm), you can set up the correct Node.js version with:
+```bash
+nvm use
+```
+The repository includes an `.nvmrc` file that specifies the correct version.
 
 ### Installation
 
@@ -119,9 +125,10 @@ This project is open source and available under the [MIT License](LICENSE).
 This project uses GitHub Actions to automatically deploy to GitHub Pages whenever changes are pushed to the main branch.
 
 The deployment workflow:
-1. Builds the React application
-2. Deploys the built files to GitHub Pages
-3. Makes the application available at [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+1. Sets up Node.js v22
+2. Builds the React application
+3. Deploys the built files to GitHub Pages
+4. Makes the application available at [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
 
 The deployment configuration can be found in the `.github/workflows/deploy.yml` file.
 

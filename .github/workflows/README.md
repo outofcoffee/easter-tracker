@@ -9,7 +9,7 @@ This directory contains GitHub Actions workflow configurations for automating ta
 - **Purpose**: Automatically deploys the Easter Bunny Tracker to GitHub Pages
 - **Trigger**: Pushes to the `main` branch or manual dispatch
 - **Actions**:
-  1. Builds the application using Node.js and npm
+  1. Builds the application using Node.js 22 and npm
   2. Configures GitHub Pages
   3. Deploys the built application to GitHub Pages
 
