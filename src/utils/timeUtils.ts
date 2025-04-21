@@ -78,9 +78,9 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
     // Check for testing overrides via environment variables
     let mockTimeString, mockDateString;
     try {
-      // @ts-ignore - Check for full time override
+      // @ts-expect-error - Accessing Vite environment variable that may be undefined at compile time
       mockTimeString = import.meta.env?.VITE_MOCK_TIME;
-      // @ts-ignore - Check for date-only override
+      // @ts-expect-error - Accessing Vite environment variable that may be undefined at compile time
       mockDateString = import.meta.env?.VITE_MOCK_DATE;
     } catch (e) {
       // No mock values available

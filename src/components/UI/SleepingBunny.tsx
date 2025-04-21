@@ -1,4 +1,4 @@
-import { useTracker } from '../../context/TrackerContext';
+import { useTracker } from '../../hooks/useTracker';
 
 const SleepingBunny = () => {
   const { nextEasterFormatted } = useTracker();

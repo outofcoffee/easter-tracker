@@ -73,7 +73,7 @@ describe('animationUtils', () => {
     });
 
     it('defaults to idle sprite for invalid animation state', () => {
-      // @ts-ignore - Testing invalid state
+      // @ts-expect-error - Testing invalid state
       expect(getBunnySprite('invalid_state')).toBe('/assets/sprites/bunny-idle.png');
     });
   });

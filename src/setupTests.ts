@@ -29,8 +29,8 @@ vi.mock('leaflet', () => {
 
 // Mock for react-leaflet
 vi.mock('react-leaflet', () => {
-  // @ts-ignore
-  const mockChildren = ({ children }: { children: any }) => {
+  // Define a mock function for components that take children
+  const mockChildren = ({ children }: { children: unknown }) => {
     return { children };
   };
   

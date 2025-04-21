@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useTracker } from '../../context/TrackerContext';
+import { useTracker } from '../../hooks/useTracker';
 import { getCurrentTime, formatTime } from '../../utils/timeUtils';
 
 const LocationInfo = () => {

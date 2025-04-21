@@ -1,4 +1,4 @@
-import { useTracker } from '../../context/TrackerContext';
+import { useTracker } from '../../hooks/useTracker';
 import { formatNumber } from '../../utils/basketCalculator';
 
 const ProgressTracker = () => {

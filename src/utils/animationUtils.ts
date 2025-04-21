@@ -16,13 +16,17 @@ export const getBunnySprite = (
     case BunnyAnimationState.IDLE:
       return '/assets/sprites/bunny-idle.png';
     case BunnyAnimationState.HOPPING:
-      // Use progress to cycle through hop animation frames
-      const hopFrame = Math.floor(progress * 4) % 4;
-      return `/assets/sprites/bunny-hop-${hopFrame}.png`;
+      { 
+        // Use progress to cycle through hop animation frames
+        const hopFrame = Math.floor(progress * 4) % 4;
+        return `/assets/sprites/bunny-hop-${hopFrame}.png`;
+      }
     case BunnyAnimationState.DELIVERING:
-      // Use progress to cycle through delivery animation frames
-      const deliveryFrame = Math.floor(progress * 3) % 3;
-      return `/assets/sprites/bunny-delivery-${deliveryFrame}.png`;
+      {
+        // Use progress to cycle through delivery animation frames
+        const deliveryFrame = Math.floor(progress * 3) % 3;
+        return `/assets/sprites/bunny-delivery-${deliveryFrame}.png`;
+      }
     default:
       return '/assets/sprites/bunny-idle.png';
   }

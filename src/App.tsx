@@ -6,7 +6,7 @@ import ProgressTracker from './components/ProgressTracker/ProgressTracker';
 import LocationInfo from './components/LocationInfo/LocationInfo';
 import DebugInfo from './components/UI/DebugInfo';
 import SleepingBunny from './components/UI/SleepingBunny';
-import { useTracker } from './context/TrackerContext';
+import { useTracker } from './hooks/useTracker';
 import { getRandomFact } from './data/easterFacts';
 
 function App() {

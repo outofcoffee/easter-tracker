@@ -1,6 +1,6 @@
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { useTracker } from '../../context/TrackerContext';
+import { useTracker } from '../../hooks/useTracker';
 import { getRandomFact, getFactForCountry } from '../../data/easterFacts';
 import { useEffect, useState } from 'react';
 import { BunnyAnimationState, calculateAnimationState } from '../../utils/animationUtils';
@@ -22,7 +22,7 @@ const BunnyMarker: React.FC<BunnyMarkerProps> = ({ position }) => {
   const { currentPosition } = useTracker();
   const [fact, setFact] = useState(getRandomFact());
   // Track animation state 
-  const [_animationState, setAnimationState] = useState(BunnyAnimationState.HOPPING);
+  const [, setAnimationState] = useState(BunnyAnimationState.HOPPING);
   
   // Update animation state based on bunny's progress
   useEffect(() => {
@@ -41,7 +41,7 @@ const BunnyMarker: React.FC<BunnyMarkerProps> = ({ position }) => {
       const countryFact = getFactForCountry(currentPosition.currentCity.country);
       setFact(countryFact || getRandomFact());
     }
-  }, [currentPosition?.currentCity?.id]);
+  }, [currentPosition?.currentCity?.id, currentPosition?.currentCity]);
   
   return (
     <Marker position={position} icon={bunnyIcon}>

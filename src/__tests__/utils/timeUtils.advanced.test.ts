@@ -16,7 +16,7 @@ describe('Advanced TimeUtils Tests', () => {
     console.error = vi.fn();
     
     // Create a fresh import.meta.env for each test
-    // @ts-ignore
+    // @ts-expect-error - Mocking import.meta.env for testing
     globalThis.import = { meta: { env: {} } };
   });
   
@@ -26,7 +26,7 @@ describe('Advanced TimeUtils Tests', () => {
     console.error = originalConsoleError;
     
     // Clean up import.meta
-    // @ts-ignore
+    // @ts-expect-error - Cleaning up mock import.meta.env
     delete globalThis.import;
     
     // Reset modules to clear any cached state

@@ -1,38 +1,9 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { calculateCurrentPosition } from '../utils/geoUtils';
 import { calculateBasketsDelivered } from '../utils/basketCalculator';
 import { BunnyPosition, ViewerLocation } from '../types';
 import { isEaster, getNextEasterDate, formatDate } from '../utils/timeUtils';
-
-interface TrackerContextType {
-  currentPosition: BunnyPosition | null;
-  totalCities: number;
-  basketsDelivered: number;
-  completionPercentage: number;
-  viewerLocation: ViewerLocation | null;
-  estimatedArrivalTime: string | null;
-  isNearby: boolean;
-  isEasterDay: boolean;
-  nextEasterDate: Date;
-  nextEasterFormatted: string;
-}
-
-const defaultContext: TrackerContextType = {
-  currentPosition: null,
-  totalCities: 0,
-  basketsDelivered: 0,
-  completionPercentage: 0,
-  viewerLocation: null,
-  estimatedArrivalTime: null,
-  isNearby: false,
-  isEasterDay: false,
-  nextEasterDate: getNextEasterDate(),
-  nextEasterFormatted: formatDate(getNextEasterDate())
-};
-
-const TrackerContext = createContext<TrackerContextType>(defaultContext);
-
-export const useTracker = () => useContext(TrackerContext);
+import { TrackerContext } from './TrackerContextDefinition';
 
 interface TrackerProviderProps {
   children: ReactNode;
@@ -112,7 +83,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
     const interval = setInterval(updatePosition, 1000);
     
     return () => clearInterval(interval);
-  }, [viewerLocation, estimatedArrivalTime, isEasterDay]);
+  }, [viewerLocation, estimatedArrivalTime, isEasterDay, viewerLocation?.nearestCity]);
 
   // Get viewer's location ONCE at startup
   useEffect(() => {
@@ -186,7 +157,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
         }
       );
     }
-  }, []);
+  }, [viewerLocation]);
 
   return (
     <TrackerContext.Provider value={{

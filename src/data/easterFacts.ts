@@ -35,7 +35,7 @@ const easterFacts: EasterFact[] = [
   },
   {
     id: 8,
-    text: 'The Easter Bunny delivers decorated eggs and candy to children while they sleep the night before Easter!'
+    text: 'The Easter Bunny delivers decorated eggs and chocolate to children while they sleep the night before Easter!'
   },
   {
     id: 9,
@@ -63,11 +63,6 @@ const easterFacts: EasterFact[] = [
   {
     id: 14,
     text: 'Easter is named after Eostre, the ancient German goddess of spring!'
-  },
-  {
-    id: 15,
-    text: 'In Hungary, boys sprinkle girls with perfume or water on Easter Monday, and in return, girls prepare meals and give painted eggs!',
-    country: 'Hungary'
   }
 ];
 
