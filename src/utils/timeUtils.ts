@@ -22,7 +22,11 @@ export const getEasterDate = (year: number): Date => {
   const month = Math.floor((h + l - 7 * m + 114) / 31);
   const day = ((h + l - 7 * m + 114) % 31) + 1;
   
-  return new Date(Date.UTC(year, month - 1, day));
+  // Create a date in UTC (avoiding Date.UTC for better compatibility)
+  const easterDate = new Date();
+  easterDate.setUTCFullYear(year, month - 1, day);
+  easterDate.setUTCHours(0, 0, 0, 0);
+  return easterDate;
 };
 
 // Define timezone constants
