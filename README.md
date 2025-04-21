@@ -93,14 +93,16 @@ eastertracker/
 
 ## How It Works
 
-The Easter Bunny Tracker simulates the Easter Bunny's journey on Easter day (April 20, 2025). It calculates the bunny's current position based on the time of day, creating a realistic journey from east to west around the world.
+The Easter Bunny Tracker simulates the Easter Bunny's journey around the world. Since Easter is celebrated on different times across the world's timezones, the bunny's journey spans approximately 50 hours - from when Easter day begins in the easternmost timezone (UTC+14) until Easter day ends in the westernmost timezone (UTC-12).
 
-The tracker shows:
-- The bunny's current location on a map
-- Which city the bunny is currently visiting
-- The number of Easter baskets delivered so far
-- How far along the journey the bunny is
-- When the bunny will arrive at the user's location
+Key Features:
+- **Global Easter Period**: The bunny is active during the entire ~50 hour global Easter period
+- **Timezone-Aware Delivery**: The bunny visits each city at midnight local time, when children are asleep
+- **Realistic Journey**: The bunny travels from east to west, following the progression of midnight across timezones
+- **Live Tracking**: See the bunny's current location, city, and progress in real-time
+- **Basket Counting**: Watch as the bunny delivers Easter baskets across the world
+- **Location-Aware**: Get personalized information about when the bunny will visit your location
+- **Sleeping Bunny**: On non-Easter days, see the bunny resting until the next Easter
 
 ## License
 

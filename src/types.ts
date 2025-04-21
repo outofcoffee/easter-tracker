@@ -5,7 +5,8 @@ export interface City {
   latitude: number;
   longitude: number;
   population: number;
-  timezone: string;
+  timezone: string; // Format: "UTC+/-HH:MM"
+  timezoneOffsetMinutes: number; // Minutes from UTC, negative for east, positive for west
 }
 
 export interface BunnyPosition {
