@@ -34,11 +34,8 @@ const ProgressTracker = () => {
       </div>
       
       <div className="mt-4 text-center">
-        <p className="text-sm">
-          {currentPosition?.visitedCities || 0} of {totalCities} cities visited
-        </p>
         {currentPosition?.currentCity && (
-          <p className="font-medium mt-2">
+          <p className="font-medium">
             Currently in {currentPosition.currentCity.name}, {currentPosition.currentCity.country}
           </p>
         )}
