@@ -1,5 +1,8 @@
 # 🐰 Easter Bunny Tracker
 
+[![CI](https://github.com/outofcoffee/easter-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/outofcoffee/easter-tracker/actions/workflows/ci.yml)
+[![Deploy to GitHub Pages](https://github.com/outofcoffee/easter-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/outofcoffee/easter-tracker/actions/workflows/deploy.yml)
+
 A fun, interactive web application that tracks the Easter Bunny's journey around the world on Easter day. Watch as the bunny hops from city to city, delivering Easter baskets to children worldwide!
 
 ## Features
@@ -120,17 +123,31 @@ Key Features:
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## Deployment
+## Deployment and CI
 
-This project uses GitHub Actions to automatically deploy to GitHub Pages whenever changes are pushed to the main branch.
+This project uses GitHub Actions for continuous integration and deployment.
 
-The deployment workflow:
+### Continuous Integration (CI)
+
+The CI workflow runs on all pull requests to the main branch and ensures code quality:
+1. Runs all tests
+2. Performs linting
+3. Verifies the build process
+
+This helps catch issues before they're merged into the main branch.
+
+### Deployment
+
+The deployment workflow automatically deploys to GitHub Pages whenever changes are pushed to the main branch:
 1. Sets up Node.js v22
-2. Builds the React application
-3. Deploys the built files to GitHub Pages
-4. Makes the application available at [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+2. Runs all tests to ensure code quality
+3. Builds the React application
+4. Deploys the built files to GitHub Pages
+5. Makes the application available at [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
 
-The deployment configuration can be found in the `.github/workflows/deploy.yml` file.
+The workflow configurations can be found in:
+- `.github/workflows/ci.yml` - For continuous integration
+- `.github/workflows/deploy.yml` - For deployment to GitHub Pages
 
 ## Acknowledgments
 
