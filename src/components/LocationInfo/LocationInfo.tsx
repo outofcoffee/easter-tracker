@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../../context/TrackerContext';
+import { getCurrentTime, formatTime } from '../../utils/timeUtils';
 
 const LocationInfo = () => {
   const { viewerLocation, estimatedArrivalTime, isNearby } = useTracker();
@@ -79,7 +80,11 @@ const LocationInfo = () => {
           </div>
         ) : estimatedArrivalTime ? (
           <div className="mt-4">
-            <p className="text-sm">The Easter Bunny will visit at approximately:</p>
+            <p className="text-sm">
+              {formatTime(getCurrentTime()) > estimatedArrivalTime
+                ? "The Easter Bunny visited at approximately:"
+                : "The Easter Bunny will visit at approximately:"}
+            </p>
             <p className="text-2xl font-bold text-easter-purple mt-1">{estimatedArrivalTime}</p>
           </div>
         ) : (
