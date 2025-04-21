@@ -6,7 +6,7 @@ const ProgressTracker = () => {
   
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-4">
-      <h2 className="text-xl font-bold text-easter-purple mb-3">Easter Bunny Progress</h2>
+      <h2 className="text-xl font-bold text-easter-dark-purple mb-3">Easter Bunny Progress</h2>
       
       <div className="grid grid-cols-2 gap-4">
         <div className="text-center">

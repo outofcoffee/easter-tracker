@@ -33,7 +33,7 @@ const LocationInfo = () => {
   if (!viewerLocation) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold text-easter-yellow mb-3">Your Location</h2>
+        <h2 className="text-xl font-bold text-easter-dark-purple mb-3">Your Location</h2>
         {permissionStatus === 'denied' ? (
           <div>
             <p>Please enable location access in your browser settings to see when the Easter Bunny will visit you!</p>
@@ -55,7 +55,7 @@ const LocationInfo = () => {
   if (!viewerLocation.nearestCity) {
     return (
       <div className="bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold text-easter-yellow mb-3">Your Location</h2>
+        <h2 className="text-xl font-bold text-easter-dark-purple mb-3">Your Location</h2>
         <p>Finding the nearest city to you...</p>
         <div className="mt-3 flex justify-center">
           <div className="w-6 h-6 border-4 border-easter-pink border-t-transparent rounded-full animate-spin"></div>
@@ -66,7 +66,7 @@ const LocationInfo = () => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold text-easter-yellow mb-3">Your Location</h2>
+      <h2 className="text-xl font-bold text-easter-dark-purple mb-3">Your Location</h2>
       
       <div className="text-center">
         <p className="font-medium">
@@ -85,7 +85,7 @@ const LocationInfo = () => {
                 ? "The Easter Bunny visited at approximately:"
                 : "The Easter Bunny will visit at approximately:"}
             </p>
-            <p className="text-2xl font-bold text-easter-purple mt-1">{estimatedArrivalTime}</p>
+            <p className="text-2xl font-bold text-easter-dark-purple mt-1">{estimatedArrivalTime}</p>
           </div>
         ) : (
           <div className="mt-4">

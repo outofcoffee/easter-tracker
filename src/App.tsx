@@ -41,7 +41,7 @@ function App() {
             <div className="inline-block animate-hop mb-4">
               <span className="text-5xl">🐰</span>
             </div>
-            <h2 className="text-xl font-bold text-easter-purple">Loading the Easter Bunny Tracker...</h2>
+            <h2 className="text-xl font-bold text-easter-dark-purple">Loading the Easter Bunny Tracker...</h2>
             <p className="mt-3 text-gray-600 italic">{fact.text}</p>
           </div>
         </div>

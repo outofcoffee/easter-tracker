@@ -12,6 +12,7 @@ export default {
           blue: '#ADD8E6',
           yellow: '#FFFACD',
           purple: '#E6E6FA',
+          'dark-purple': '#6A0DAD',
           green: '#98FB98'
         }
       },
