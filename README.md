@@ -19,6 +19,10 @@ A fun, interactive web application that tracks the Easter Bunny's journey around
 - Leaflet.js for interactive maps
 - Vitest for testing
 
+## Live Demo
+
+Check out the Easter Bunny Tracker live at: [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+
 ## Getting Started
 
 ### Prerequisites
@@ -30,8 +34,8 @@ A fun, interactive web application that tracks the Easter Bunny's journey around
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/eastertracker.git
-cd eastertracker
+git clone https://github.com/outofcoffee/easter-tracker.git
+cd easter-tracker
 
 # Install dependencies
 npm install
@@ -62,6 +66,8 @@ For testing different times of day, you can use environment variables to control
 
 ```bash
 npm run build
+
+# The built files will be in the dist/ directory
 ```
 
 ## Testing
@@ -107,6 +113,17 @@ Key Features:
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+## Deployment
+
+This project uses GitHub Actions to automatically deploy to GitHub Pages whenever changes are pushed to the main branch.
+
+The deployment workflow:
+1. Builds the React application
+2. Deploys the built files to GitHub Pages
+3. Makes the application available at [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+
+The deployment configuration can be found in the `.github/workflows/deploy.yml` file.
 
 ## Acknowledgments
 

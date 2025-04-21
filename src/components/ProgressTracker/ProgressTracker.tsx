@@ -2,7 +2,7 @@ import { useTracker } from '../../context/TrackerContext';
 import { formatNumber } from '../../utils/basketCalculator';
 
 const ProgressTracker = () => {
-  const { basketsDelivered, completionPercentage, totalCities, currentPosition } = useTracker();
+  const { basketsDelivered, completionPercentage, currentPosition } = useTracker();
   
   return (
     <div className="bg-white p-4 rounded-lg shadow-md mb-4">
