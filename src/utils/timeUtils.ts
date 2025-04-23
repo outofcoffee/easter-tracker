@@ -75,15 +75,24 @@ interface GetCurrentTimeFunction {
 
 export const getCurrentTime = ((): GetCurrentTimeFunction => {
   const func = (): Date => {
-    // Check for testing overrides via environment variables
+    // Check for testing overrides via query parameters first, then environment variables
     let mockTimeString, mockDateString;
-    try {
-      // @ts-expect-error - Accessing Vite environment variable that may be undefined at compile time
-      mockTimeString = import.meta.env?.VITE_MOCK_TIME;
-      // @ts-expect-error - Accessing Vite environment variable that may be undefined at compile time
-      mockDateString = import.meta.env?.VITE_MOCK_DATE;
-    } catch (e) {
-      // No mock values available
+    
+    // Check URL query parameters (using snake_case param names)
+    const urlParams = new URLSearchParams(window.location.search);
+    mockTimeString = urlParams.get('mock_time');
+    mockDateString = urlParams.get('mock_date');
+    
+    // If not found in query params, check environment variables
+    if (!mockTimeString && !mockDateString) {
+      try {
+        // @ts-expect-error - Accessing Vite environment variable that may be undefined at compile time
+        mockTimeString = import.meta.env?.VITE_MOCK_TIME;
+        // @ts-expect-error - Accessing Vite environment variable that may be undefined at compile time
+        mockDateString = import.meta.env?.VITE_MOCK_DATE;
+      } catch (e) {
+        // No mock values available
+      }
     }
     
     // VITE_MOCK_TIME takes precedence over VITE_MOCK_DATE

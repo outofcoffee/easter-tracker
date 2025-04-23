@@ -57,7 +57,17 @@ npm run dev
 
 ### Testing with Mock Time
 
-For testing different times of day, you can use environment variables to control the Easter Bunny's position:
+For testing different times of day, you can use query parameters or environment variables to control the Easter Bunny's position:
+
+#### Using Query Parameters
+
+Simply add one of the following query parameters to the URL:
+- `mock_time`: Set specific date AND time (e.g., `?mock_time=2025-04-20T12:30:00Z` for 12:30 PM on Easter)
+- `mock_date`: Set only the date but use real time (e.g., `?mock_date=2025-04-20` for Easter day)
+
+Example: `http://localhost:3000/?mock_time=2025-04-20T12:30:00Z&debug=true`
+
+#### Using Environment Variables
 
 1. Copy the example environment file:
    ```bash
@@ -72,6 +82,8 @@ For testing different times of day, you can use environment variables to control
    ```
    VITE_DEBUG=true
    ```
+
+Query parameters take precedence over environment variables if both are specified.
 
 ### Build for Production
 
