@@ -24,7 +24,9 @@ A fun, interactive web application that tracks the Easter Bunny's journey around
 
 ## Live Demo
 
-Check out the Easter Bunny Tracker live at: [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+Check out the Easter Bunny Tracker live at: [https://easterbunny.live](https://easterbunny.live)
+
+Development version: [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
 
 ## Getting Started
 
@@ -143,7 +145,8 @@ The deployment workflow automatically deploys to GitHub Pages whenever changes a
 2. Runs all tests to ensure code quality
 3. Builds the React application
 4. Deploys the built files to GitHub Pages
-5. Makes the application available at [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+5. Makes the development version available at [https://outofcoffee.github.io/easter-tracker/](https://outofcoffee.github.io/easter-tracker/)
+6. The production version is available at [https://easterbunny.live](https://easterbunny.live)
 
 The workflow configurations can be found in:
 - `.github/workflows/ci.yml` - For continuous integration
