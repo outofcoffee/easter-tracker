@@ -1,10 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+let base = '/'
+if (process.env.GITHUB_PAGES === 'true') {
+  base = '/easter-tracker/'
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/easter-tracker/',
+  base,
   server: {
     port: 3000,
     open: true
