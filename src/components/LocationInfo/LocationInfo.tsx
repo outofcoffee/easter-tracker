@@ -3,11 +3,14 @@ import { useTracker } from '../../hooks/useTracker';
 import { getCurrentTime, formatTime } from '../../utils/timeUtils';
 
 const LocationInfo = () => {
-  const { viewerLocation, estimatedArrivalTime, isNearby } = useTracker();
+  const { viewerLocation, estimatedArrivalTime, isNearby, isEasterDay } = useTracker();
   const [permissionStatus, setPermissionStatus] = useState<string>('prompt');
   
-  // Check geolocation permission status
+  // Check geolocation permission status - only if it's Easter Day
   useEffect(() => {
+    // Skip permission check if it's not Easter Day
+    if (!isEasterDay) return;
+    
     const checkPermission = async () => {
       try {
         if ('permissions' in navigator) {
@@ -27,7 +30,12 @@ const LocationInfo = () => {
     };
     
     checkPermission();
-  }, []);
+  }, [isEasterDay]);
+  
+  // Don't show location info at all if it's not Easter
+  if (!isEasterDay) {
+    return null;
+  }
   
   // Handle prompt permission or loading state
   if (!viewerLocation) {

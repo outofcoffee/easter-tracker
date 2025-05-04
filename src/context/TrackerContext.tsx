@@ -85,11 +85,19 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
     return () => clearInterval(interval);
   }, [viewerLocation, estimatedArrivalTime, isEasterDay, viewerLocation?.nearestCity]);
 
-  // Get viewer's location ONCE at startup
+  // Get viewer's location ONCE at startup, but only during Easter period
   useEffect(() => {
-    // Only get location if we don't already have it
-    if (!viewerLocation && navigator.geolocation) {
-      console.log("Getting user location once at startup");
+    // Only get location if:
+    // 1. We don't already have it
+    // 2. Geolocation is available
+    // 3. It's Easter day (do not request in development when not Easter)
+    const shouldRequestLocation = 
+      !viewerLocation && 
+      navigator.geolocation && 
+      isEasterDay;
+    
+    if (shouldRequestLocation) {
+      console.log(`Getting user location once during Easter period (isEasterDay: ${isEasterDay})`);
       
       navigator.geolocation.getCurrentPosition(
         async (position) => {
@@ -122,7 +130,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
           
           // Try once more after a delay (user might have dismissed the prompt)
           setTimeout(() => {
-            if (!viewerLocation) {
+            if (!viewerLocation && isEasterDay) {
               console.log("Retrying geolocation once...");
               navigator.geolocation.getCurrentPosition(
                 async (position) => {
@@ -157,7 +165,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
         }
       );
     }
-  }, [viewerLocation]);
+  }, [viewerLocation, isEasterDay]);
 
   return (
     <TrackerContext.Provider value={{
