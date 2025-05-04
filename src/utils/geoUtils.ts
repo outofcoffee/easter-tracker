@@ -1,4 +1,4 @@
-import { City, BunnyPosition } from '../types';
+import { City, BunnyPosition, DEFAULT_MAP_ZOOM } from '../types';
 import { getCities } from '../data/cities';
 
 // Calculate distance between two points using Haversine formula
@@ -55,7 +55,7 @@ export const getNearestCity = (
 };
 
 // Calculate the current position of the Easter Bunny
-export const calculateCurrentPosition = async (): Promise<BunnyPosition | null> => {
+export const calculateCurrentPosition = async (mapZoomLevel?: number): Promise<BunnyPosition | null> => {
   try {
     // Import time utilities
     const { 
@@ -168,9 +168,85 @@ export const calculateCurrentPosition = async (): Promise<BunnyPosition | null> 
     let latitude, longitude;
     
     if (currentIndex === nextIndex) {
-      // At a city (not in transit)
-      latitude = currentCity.latitude;
-      longitude = currentCity.longitude;
+      // At a city (not in transit) - implement "hopping" delivery pattern
+      // Much more dramatic and visible movement
+      
+      // Use time to create discrete "hops" between delivery points
+      const now = Date.now();
+      const hopPeriod = 1000; // Time in ms between major position changes (1 second)
+      const hopPhase = (now % hopPeriod) / hopPeriod; // 0-1 progress through current hop
+      
+      // Create "hop points" based on time
+      // This creates a new random target every second
+      const hopSeed = Math.floor(now / hopPeriod);
+      
+      // Use the hop seed to generate pseudo-random but consistent coordinates
+      // This creates a random but not chaotic pattern of delivery points
+      const rand1 = Math.sin(hopSeed * 123.456) * 0.5 + 0.5; // 0-1
+      const rand2 = Math.cos(hopSeed * 789.012) * 0.5 + 0.5; // 0-1
+      
+      // Scale movement based on zoom level - but MUCH larger than before
+      // At zoom level 4, we want movement to be easily visible
+      const zoom = mapZoomLevel || DEFAULT_MAP_ZOOM;
+      
+      // Calculate delivery range based on zoom 
+      // This is much more aggressive than before - up to 5-8 degrees at low zoom
+      // which is very noticeable even on a world map
+      let deliveryRange;
+      if (zoom <= 2) {
+        // World view - massive jumps (countries apart)
+        deliveryRange = 8.0;
+      } else if (zoom <= 4) {
+        // Continental view - large jumps (regions apart)
+        deliveryRange = 4.0;
+      } else if (zoom <= 6) {
+        // Country view - medium jumps (cities apart)
+        deliveryRange = 2.0;
+      } else if (zoom <= 8) {
+        // Regional view - smaller jumps (neighborhoods apart)
+        deliveryRange = 1.0;
+      } else if (zoom <= 10) {
+        // City view - very small jumps (blocks apart)
+        deliveryRange = 0.5;
+      } else {
+        // Street view - tiny jumps (houses apart)
+        deliveryRange = 0.2;
+      }
+      
+      // Calculate current target position
+      const targetLat = currentCity.latitude + (rand1 * 2 - 1) * deliveryRange;
+      const targetLon = currentCity.longitude + (rand2 * 2 - 1) * deliveryRange;
+      
+      // Previous position (another random point)
+      const prevRand1 = Math.sin((hopSeed - 1) * 123.456) * 0.5 + 0.5;
+      const prevRand2 = Math.cos((hopSeed - 1) * 789.012) * 0.5 + 0.5;
+      const prevLat = currentCity.latitude + (prevRand1 * 2 - 1) * deliveryRange;
+      const prevLon = currentCity.longitude + (prevRand2 * 2 - 1) * deliveryRange;
+      
+      // Create a hopping effect with a slight pause at each delivery point
+      // This makes the movement more deliberate and noticeable
+      let effectivePhase = hopPhase;
+      
+      // Add "rest" at beginning and end of hop (20% of time)
+      if (hopPhase < 0.1) {
+        // Starting position - slight pause
+        effectivePhase = 0;
+      } else if (hopPhase > 0.9) {
+        // Ending position - slight pause
+        effectivePhase = 1;
+      } else {
+        // Rescale the middle portion for smooth transition
+        effectivePhase = (hopPhase - 0.1) / 0.8;
+        
+        // Add a slight arc to the hop using a sine wave
+        // This makes it look more like hopping than straight line movement
+        const hopHeight = Math.sin(effectivePhase * Math.PI);
+        effectivePhase = effectivePhase + hopHeight * 0.1; // Small arc effect
+      }
+      
+      // Interpolate between previous and target positions
+      latitude = prevLat + (targetLat - prevLat) * effectivePhase;
+      longitude = prevLon + (targetLon - prevLon) * effectivePhase;
     } else {
       // Interpolate between cities
       latitude = currentCity.latitude + (nextCity.latitude - currentCity.latitude) * transitionProgress;
@@ -189,7 +265,8 @@ export const calculateCurrentPosition = async (): Promise<BunnyPosition | null> 
       totalCities: cities.length,
       visitedCities: currentIndex,
       completionPercentage: progress * 100,
-      transitionProgress
+      transitionProgress,
+      mapZoomLevel
     };
   } catch (error) {
     console.error('Error calculating bunny position:', error);

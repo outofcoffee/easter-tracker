@@ -35,10 +35,16 @@ export const getBunnySprite = (
 // Calculate the animation state based on the bunny's journey progress
 export const calculateAnimationState = (
   _completionPercentage: number,
-  transitionProgress: number
+  transitionProgress: number,
+  isAtCity: boolean = false
 ): BunnyAnimationState => {
+  // If we're at a city, show delivery animation
+  if (isAtCity) {
+    return BunnyAnimationState.DELIVERING;
+  }
+  
   // If we're more than 75% through the transition between cities,
-  // show the delivery animation
+  // also show the delivery animation as we approach the destination
   if (transitionProgress > 0.75 && transitionProgress < 0.95) {
     return BunnyAnimationState.DELIVERING;
   }

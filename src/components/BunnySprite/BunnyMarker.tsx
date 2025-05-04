@@ -27,9 +27,15 @@ const BunnyMarker: React.FC<BunnyMarkerProps> = ({ position }) => {
   // Update animation state based on bunny's progress
   useEffect(() => {
     if (currentPosition) {
+      // Check if bunny is at a city (currentCity equals nextCity)
+      const isAtCity = currentPosition.currentCity && 
+                       currentPosition.nextCity && 
+                       currentPosition.currentCity.id === currentPosition.nextCity.id;
+      
       const newState = calculateAnimationState(
         currentPosition.completionPercentage,
-        currentPosition.transitionProgress
+        currentPosition.transitionProgress,
+        isAtCity
       );
       setAnimationState(newState);
     }

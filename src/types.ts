@@ -9,6 +9,9 @@ export interface City {
   timezoneOffsetMinutes: number; // Minutes from UTC, negative for east, positive for west
 }
 
+// Default map zoom level - single source of truth
+export const DEFAULT_MAP_ZOOM = 4;
+
 export interface BunnyPosition {
   latitude: number;
   longitude: number;
@@ -19,6 +22,7 @@ export interface BunnyPosition {
   visitedCities: number;
   completionPercentage: number;
   transitionProgress: number;
+  mapZoomLevel?: number; // Optional zoom level for position calculation
 }
 
 export interface ViewerLocation {

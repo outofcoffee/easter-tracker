@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useTracker } from '../../hooks/useTracker';
 import BunnyMarker from '../BunnySprite/BunnyMarker';
+import { DEFAULT_MAP_ZOOM } from '../../types';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for Leaflet marker icon issue
@@ -13,9 +14,9 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// Component to handle map positioning
+// Component to handle map positioning and zoom tracking
 const MapController = () => {
-  const { currentPosition } = useTracker();
+  const { currentPosition, setMapZoomLevel } = useTracker();
   const map = useMap();
   
   useEffect(() => {
@@ -27,6 +28,24 @@ const MapController = () => {
     }
   }, [currentPosition, map]);
   
+  // Track zoom level changes
+  useEffect(() => {
+    // Update context with initial zoom level
+    setMapZoomLevel(map.getZoom());
+    
+    // Add event listener for zoom changes
+    const handleZoomChange = () => {
+      setMapZoomLevel(map.getZoom());
+    };
+    
+    map.on('zoom', handleZoomChange);
+    
+    // Cleanup event listener
+    return () => {
+      map.off('zoom', handleZoomChange);
+    };
+  }, [map, setMapZoomLevel]);
+  
   return null;
 };
 
@@ -36,7 +55,7 @@ const Map = () => {
   
   // Default position (middle of the world)
   const defaultPosition: [number, number] = [0, 0];
-  const defaultZoom = 2;
+  const defaultZoom = DEFAULT_MAP_ZOOM;
   
   // Update ref when map is created
   const MapInitializer = () => {

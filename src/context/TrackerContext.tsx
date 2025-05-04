@@ -1,7 +1,7 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { calculateCurrentPosition } from '../utils/geoUtils';
 import { calculateBasketsDelivered } from '../utils/basketCalculator';
-import { BunnyPosition, ViewerLocation } from '../types';
+import { BunnyPosition, ViewerLocation, DEFAULT_MAP_ZOOM } from '../types';
 import { isEaster, getNextEasterDate, formatDate } from '../utils/timeUtils';
 import { TrackerContext } from './TrackerContextDefinition';
 
@@ -20,6 +20,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
   const [isEasterDay, setIsEasterDay] = useState(isEaster());
   const [nextEasterDate, setNextEasterDate] = useState(getNextEasterDate());
   const [nextEasterFormatted, setNextEasterFormatted] = useState(formatDate(getNextEasterDate()));
+  const [mapZoomLevel, setMapZoomLevel] = useState(DEFAULT_MAP_ZOOM); // Default zoom level
 
   // Check if it's Easter Day and update relevant information
   useEffect(() => {
@@ -53,7 +54,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
     }
     
     const updatePosition = async () => {
-      const position = await calculateCurrentPosition();
+      const position = await calculateCurrentPosition(mapZoomLevel);
       
       if (position) {
         setCurrentPosition(position);
@@ -83,7 +84,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
     const interval = setInterval(updatePosition, 1000);
     
     return () => clearInterval(interval);
-  }, [viewerLocation, estimatedArrivalTime, isEasterDay, viewerLocation?.nearestCity]);
+  }, [viewerLocation, estimatedArrivalTime, isEasterDay, viewerLocation?.nearestCity, mapZoomLevel]);
 
   // Get viewer's location ONCE at startup, but only during Easter period
   useEffect(() => {
@@ -178,7 +179,9 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
       isNearby,
       isEasterDay,
       nextEasterDate,
-      nextEasterFormatted
+      nextEasterFormatted,
+      mapZoomLevel,
+      setMapZoomLevel
     }}>
       {children}
     </TrackerContext.Provider>
