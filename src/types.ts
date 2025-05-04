@@ -23,6 +23,7 @@ export interface BunnyPosition {
   completionPercentage: number;
   transitionProgress: number;
   mapZoomLevel?: number; // Optional zoom level for position calculation
+  overLand: boolean; // Whether the bunny is currently over land (not ocean)
 }
 
 export interface ViewerLocation {

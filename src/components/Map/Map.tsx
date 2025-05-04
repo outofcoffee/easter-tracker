@@ -2,9 +2,12 @@ import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useTracker } from '../../hooks/useTracker';
-import BunnyMarker from '../BunnySprite/BunnyMarker';
+import DeliveryBunny from '../BunnySprite/DeliveryBunny';
 import { DEFAULT_MAP_ZOOM } from '../../types';
 import 'leaflet/dist/leaflet.css';
+
+// Add a class to the map container for targeting with CSS
+import './map-styles.css';
 
 // Fix for Leaflet marker icon issue
 delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
@@ -52,10 +55,28 @@ const MapController = () => {
 const Map = () => {
   const { currentPosition, viewerLocation } = useTracker();
   const mapRef = useRef<L.Map | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Default position (middle of the world)
   const defaultPosition: [number, number] = [0, 0];
   const defaultZoom = DEFAULT_MAP_ZOOM;
+  
+  // Function to determine if the bunny is delivering at a city
+  const isDeliveringAtCity = currentPosition && 
+    currentPosition.currentCity && 
+    currentPosition.nextCity && 
+    currentPosition.currentCity.id === currentPosition.nextCity.id;
+
+  // Debug the delivery state  
+  useEffect(() => {
+    if (currentPosition) {
+      console.log('Current bunny position:', currentPosition);
+      console.log('Is delivering at city:', isDeliveringAtCity ? 'Yes' : 'No');
+      console.log('Is over land:', currentPosition.overLand ? 'Yes' : 'No');
+      console.log('Current city:', currentPosition.currentCity?.name);
+      console.log('Next city:', currentPosition.nextCity?.name);
+    }
+  }, [currentPosition, isDeliveringAtCity]);
   
   // Update ref when map is created
   const MapInitializer = () => {
@@ -67,12 +88,13 @@ const Map = () => {
   };
   
   return (
-    <div className="w-full h-full rounded-xl overflow-hidden shadow-lg">
+    <div ref={containerRef} className="w-full h-full rounded-xl overflow-hidden shadow-lg">
       <MapContainer
         center={currentPosition 
           ? [currentPosition.latitude, currentPosition.longitude] 
           : defaultPosition}
         zoom={defaultZoom}
+        className="easter-map"
         style={{ height: '100%', width: '100%' }}
       >
         <MapInitializer />
@@ -81,9 +103,9 @@ const Map = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         
-        {/* Easter Bunny Marker */}
+        {/* Easter Bunny Marker with delivery items */}
         {currentPosition && (
-          <BunnyMarker position={[currentPosition.latitude, currentPosition.longitude]} />
+          <DeliveryBunny position={[currentPosition.latitude, currentPosition.longitude]} />
         )}
         
         {/* User Location Marker */}
@@ -101,6 +123,11 @@ const Map = () => {
         )}
         
         <MapController />
+        
+        {/* 
+          Eggs and baskets are now handled directly by the BunnyMarker component
+          This is much more reliable and visually coherent
+        */}
       </MapContainer>
     </div>
   );

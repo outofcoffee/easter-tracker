@@ -1,5 +1,7 @@
 import { City, BunnyPosition, DEFAULT_MAP_ZOOM } from '../types';
 import { getCities } from '../data/cities';
+// Import the GeoJSON-based land detector for more accurate landmass detection
+import { isOverLand, getLandmassName } from './landmassDetectorGeoJSON';
 
 // Calculate distance between two points using Haversine formula
 export const calculateDistance = (
@@ -248,14 +250,40 @@ export const calculateCurrentPosition = async (mapZoomLevel?: number): Promise<B
       latitude = prevLat + (targetLat - prevLat) * effectivePhase;
       longitude = prevLon + (targetLon - prevLon) * effectivePhase;
     } else {
-      // Interpolate between cities
-      latitude = currentCity.latitude + (nextCity.latitude - currentCity.latitude) * transitionProgress;
-      longitude = currentCity.longitude + (nextCity.longitude - currentCity.longitude) * transitionProgress;
+      // Find position between cities, avoiding long water crossings
+      const pathPosition = findOverlandPosition(
+        currentCity.latitude, 
+        currentCity.longitude,
+        nextCity.latitude,
+        nextCity.longitude,
+        transitionProgress
+      );
+      
+      latitude = pathPosition.latitude;
+      longitude = pathPosition.longitude;
     }
     
     // Find nearest city to current position
     const nearestCity = getNearestCity(latitude, longitude, cities);
     
+    // Determine if the bunny is over land (not ocean) using our landmass detector
+    const overLand = isOverLand(latitude, longitude);
+    
+    // Debug land detection
+    const landmassName = getLandmassName(latitude, longitude);
+    console.log(`Bunny position: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+    console.log(`Landmass detection: ${overLand ? 'YES' : 'NO'}, name: ${landmassName || 'NONE'}`);
+    
+    // If bunny is over water during travel, try to find a nearby land point
+    if (!overLand && currentIndex !== nextIndex) {
+      const nearbyLandPosition = findNearbyLandPosition(latitude, longitude, 2.0);
+      if (nearbyLandPosition) {
+        latitude = nearbyLandPosition.latitude;
+        longitude = nearbyLandPosition.longitude;
+        console.log(`Adjusted to nearby land: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+      }
+    }
+
     return {
       latitude,
       longitude,
@@ -266,7 +294,8 @@ export const calculateCurrentPosition = async (mapZoomLevel?: number): Promise<B
       visitedCities: currentIndex,
       completionPercentage: progress * 100,
       transitionProgress,
-      mapZoomLevel
+      mapZoomLevel,
+      overLand
     };
   } catch (error) {
     console.error('Error calculating bunny position:', error);
@@ -302,4 +331,270 @@ export const calculateArrivalTime = async (city: City): Promise<string> => {
   
   // Format the time for display
   return formatTime(arrivalTime);
+};
+
+/**
+ * Find a position along a path between two cities, preferring land routes
+ * 
+ * This function creates a path between two cities that tries to follow landmasses
+ * instead of taking a direct route over water.
+ * 
+ * @param startLat Start latitude
+ * @param startLon Start longitude
+ * @param endLat End latitude
+ * @param endLon End longitude
+ * @param progress Progress between 0 and 1
+ * @returns Object with latitude and longitude
+ */
+const findOverlandPosition = (
+  startLat: number, 
+  startLon: number, 
+  endLat: number, 
+  endLon: number, 
+  progress: number
+): { latitude: number; longitude: number } => {
+  // Check if we're at the start or end
+  if (progress <= 0) {
+    return { latitude: startLat, longitude: startLon };
+  }
+  
+  if (progress >= 1) {
+    return { latitude: endLat, longitude: endLon };
+  }
+  
+  // First, check if a direct path between the two cities crosses a lot of water
+  // by sampling 10 points along the path
+  const directPathOverWater = checkDirectPathOverWater(startLat, startLon, endLat, endLon);
+  
+  if (!directPathOverWater) {
+    // If the direct path doesn't cross too much water, use simple interpolation
+    return {
+      latitude: startLat + (endLat - startLat) * progress,
+      longitude: startLon + (endLon - startLon) * progress
+    };
+  }
+  
+  // For paths that cross a lot of water, we'll try to find an intermediate land point
+  // that can serve as a waypoint between the two cities
+  
+  // Get the waypoints (can be multiple for very long routes)
+  const waypoints = findLandWaypoints(startLat, startLon, endLat, endLon);
+  
+  // If no waypoints found (very rare), fall back to direct path
+  if (waypoints.length === 0) {
+    return {
+      latitude: startLat + (endLat - startLat) * progress,
+      longitude: startLon + (endLon - startLon) * progress
+    };
+  }
+  
+  // Add start and end points to create a full path
+  const fullPath = [
+    { latitude: startLat, longitude: startLon },
+    ...waypoints,
+    { latitude: endLat, longitude: endLon }
+  ];
+  
+  // Calculate the total path length
+  let totalDistance = 0;
+  const segmentDistances = [];
+  
+  for (let i = 0; i < fullPath.length - 1; i++) {
+    const dist = calculateDistance(
+      fullPath[i].latitude, fullPath[i].longitude,
+      fullPath[i + 1].latitude, fullPath[i + 1].longitude
+    );
+    segmentDistances.push(dist);
+    totalDistance += dist;
+  }
+  
+  // Calculate cumulative progress for each segment
+  const cumulativeProgress = [0];
+  let runningTotal = 0;
+  
+  for (const dist of segmentDistances) {
+    runningTotal += dist / totalDistance;
+    cumulativeProgress.push(runningTotal);
+  }
+  
+  // Find which segment our progress falls into
+  let segmentIndex = 0;
+  for (let i = 0; i < cumulativeProgress.length - 1; i++) {
+    if (progress >= cumulativeProgress[i] && progress <= cumulativeProgress[i + 1]) {
+      segmentIndex = i;
+      break;
+    }
+  }
+  
+  // Calculate progress within the segment
+  const segmentProgress = 
+    (progress - cumulativeProgress[segmentIndex]) / 
+    (cumulativeProgress[segmentIndex + 1] - cumulativeProgress[segmentIndex]);
+  
+  // Interpolate position within the segment
+  return {
+    latitude: fullPath[segmentIndex].latitude + 
+              (fullPath[segmentIndex + 1].latitude - fullPath[segmentIndex].latitude) * segmentProgress,
+    longitude: fullPath[segmentIndex].longitude + 
+               (fullPath[segmentIndex + 1].longitude - fullPath[segmentIndex].longitude) * segmentProgress
+  };
+};
+
+/**
+ * Check if a direct path between two points crosses a lot of water
+ * 
+ * @param startLat Start latitude
+ * @param startLon Start longitude
+ * @param endLat End latitude
+ * @param endLon End longitude
+ * @returns true if the path crosses a significant amount of water
+ */
+const checkDirectPathOverWater = (
+  startLat: number, 
+  startLon: number, 
+  endLat: number, 
+  endLon: number
+): boolean => {
+  // First check if both endpoints are over land
+  const startIsLand = isOverLand(startLat, startLon);
+  const endIsLand = isOverLand(endLat, endLon);
+  
+  // If both points are on land, check if they're close
+  if (startIsLand && endIsLand) {
+    const distance = calculateDistance(startLat, startLon, endLat, endLon);
+    
+    // For short distances between land points, assume not a water crossing
+    if (distance < 500) { // 500km
+      return false;
+    }
+  }
+  
+  // Check points along the path
+  const numSamples = 8;
+  let waterCount = 0;
+  
+  for (let i = 1; i < numSamples - 1; i++) {
+    const progress = i / numSamples;
+    const lat = startLat + (endLat - startLat) * progress;
+    const lon = startLon + (endLon - startLon) * progress;
+    
+    if (!isOverLand(lat, lon)) {
+      waterCount++;
+      
+      // For efficiency, if we've seen enough water points already,
+      // we can return early
+      if (waterCount > numSamples * 0.3) {
+        return true;
+      }
+    }
+  }
+  
+  // If more than 30% of the path is over water, it's a water crossing
+  return waterCount > numSamples * 0.3;
+};
+
+/**
+ * Find land waypoints between two points to avoid water crossings
+ */
+const findLandWaypoints = (
+  startLat: number, 
+  startLon: number, 
+  endLat: number, 
+  endLon: number
+): { latitude: number; longitude: number }[] => {
+  // Get the distance between the points
+  const distance = calculateDistance(startLat, startLon, endLat, endLon);
+  
+  // For short distances, don't add waypoints
+  if (distance < 1000) { // Less than 1000km
+    return [];
+  }
+  
+  // Predefined waypoints for common ocean crossings
+  // These are strategic land points that help avoid long ocean crossings
+  // Format: [startLat, startLon, endLat, endLon, waypoints[]]
+  const knownCrossings: [number, number, number, number, { latitude: number; longitude: number }[]][] = [
+    // North Atlantic crossing (Europe to North America)
+    [50, -5, 40, -70, [
+      { latitude: 63, longitude: -20 }, // Iceland
+      { latitude: 60, longitude: -45 }, // Southern Greenland
+      { latitude: 47, longitude: -56 }  // Newfoundland
+    ]],
+    
+    // Pacific crossing (North America to Asia)
+    [37, -122, 35, 140, [
+      { latitude: 51, longitude: -176 }, // Aleutian Islands
+      { latitude: 45, longitude: 150 }   // Northern Japan
+    ]],
+    
+    // Europe to Africa
+    [40, 10, 0, 10, [
+      { latitude: 37, longitude: 11 }    // Sicily
+    ]]
+  ];
+  
+  // Check if this path matches any known crossing
+  for (const crossing of knownCrossings) {
+    const [crossStartLat, crossStartLon, crossEndLat, crossEndLon, waypoints] = crossing;
+    
+    // Calculate distances to crossing start and end points
+    const distToStart = calculateDistance(startLat, startLon, crossStartLat, crossStartLon);
+    const distToEnd = calculateDistance(endLat, endLon, crossEndLat, crossEndLon);
+    
+    // If we're close enough to this known crossing, use its waypoints
+    if (distToStart < 1500 && distToEnd < 1500) {
+      return waypoints;
+    }
+  }
+  
+  // If no known crossing matches, try to find a midpoint that's on land
+  const midLat = (startLat + endLat) / 2;
+  const midLon = (startLon + endLon) / 2;
+  
+  // Search for land near the midpoint
+  const landPoint = findNearbyLandPosition(midLat, midLon, 10.0);
+  if (landPoint) {
+    return [landPoint];
+  }
+  
+  // If we couldn't find a good land point, return an empty array
+  // (will result in direct path)
+  return [];
+};
+
+/**
+ * Find a nearby land position 
+ * 
+ * @param latitude Start latitude
+ * @param longitude Start longitude
+ * @param maxSearchDegrees Maximum search radius in degrees
+ * @returns Land position or null if none found
+ */
+const findNearbyLandPosition = (
+  latitude: number,
+  longitude: number,
+  maxSearchDegrees: number
+): { latitude: number; longitude: number } | null => {
+  // Check if the current position is already over land
+  if (isOverLand(latitude, longitude)) {
+    return { latitude, longitude };
+  }
+  
+  // Search in increasing radius until we find land or reach max search distance
+  for (let radius = 0.5; radius <= maxSearchDegrees; radius += 0.5) {
+    // Try 8 directions (N, NE, E, SE, S, SW, W, NW)
+    for (let angle = 0; angle < 360; angle += 45) {
+      const radians = angle * Math.PI / 180;
+      const newLat = latitude + radius * Math.sin(radians);
+      const newLon = longitude + radius * Math.cos(radians);
+      
+      // Check if this point is over land
+      if (isOverLand(newLat, newLon)) {
+        return { latitude: newLat, longitude: newLon };
+      }
+    }
+  }
+  
+  // No land found within search radius
+  return null;
 };

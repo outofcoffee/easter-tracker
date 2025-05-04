@@ -77,12 +77,28 @@ function App() {
                 <Map />
               </div>
               
-              {/* Current location banner */}
+              {/* Current location banner with status indication */}
               {currentPosition?.currentCity && (
-                <div className="mb-8 bg-easter-pink text-white p-3 rounded-lg text-center animate-pulse">
-                  <p className="font-bold">
-                    The Easter Bunny is currently in {currentPosition.currentCity.name}, {currentPosition.currentCity.country}!
-                  </p>
+                <div className={`mb-8 ${currentPosition.currentCity.id === currentPosition.nextCity?.id 
+                  ? 'bg-easter-pink animate-pulse' 
+                  : 'bg-easter-blue'} text-white p-3 rounded-lg text-center`}>
+                  {currentPosition.currentCity.id === currentPosition.nextCity?.id ? (
+                    // Delivering at a city
+                    <div>
+                      <p className="font-bold">
+                        The Easter Bunny is delivering baskets in {currentPosition.currentCity.name}, {currentPosition.currentCity.country}!
+                      </p>
+                      <p className="text-sm mt-1">Dropping off eggs and chocolate for the children!</p>
+                    </div>
+                  ) : (
+                    // Traveling between cities
+                    <div>
+                      <p className="font-bold">
+                        The Easter Bunny is flying from {currentPosition.currentCity.name} to {currentPosition.nextCity?.name}!
+                      </p>
+                      <p className="text-sm mt-1">Next delivery: {currentPosition.nextCity?.name}, {currentPosition.nextCity?.country}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
