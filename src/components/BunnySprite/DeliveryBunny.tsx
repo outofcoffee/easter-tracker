@@ -5,10 +5,52 @@ import { useTracker } from '../../hooks/useTracker';
 import { getRandomFact, getFactForCountry } from '../../data/easterFacts';
 import './delivery-bunny.css';
 
+// Helper function to get the appropriate emoji for each item type
+const getItemEmoji = (type: string): string => {
+  switch (type) {
+    case 'egg':
+      return '🥚';
+    case 'basket':
+      return '🧺';
+    case 'candy':
+      return '🍬';
+    default:
+      return '🥚';
+  }
+};
+
+// Helper function to get the appropriate font size for each item type
+const getItemFontSize = (type: string): number => {
+  switch (type) {
+    case 'egg':
+      return 16;
+    case 'basket':
+      return 20;
+    case 'candy':
+      return 15;
+    default:
+      return 16;
+  }
+};
+
+// Helper function to get the appropriate border-radius for each item type
+const getItemBorderRadius = (type: string): string => {
+  switch (type) {
+    case 'egg':
+      return '50%';
+    case 'basket':
+      return '30%';
+    case 'candy':
+      return '45%';
+    default:
+      return '50%';
+  }
+};
+
 // Interface for a delivery item
 interface DeliveryItem {
   id: string;
-  type: 'egg' | 'basket';
+  type: 'egg' | 'basket' | 'candy';
   angle: number;
   distance: number;
   color: string;
@@ -65,29 +107,73 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
     // Spawn new items occasionally
     const now = Date.now();
     const timeSinceLastSpawn = now - lastSpawnTimeRef.current;
-    const spawnInterval = isAtCity ? 2000 : 3500; // Spawn rate based on location
+    const spawnInterval = isAtCity ? 1800 : 3000; // Faster spawn rate based on location (was 2000/3500)
     
     if (timeSinceLastSpawn >= spawnInterval) {
       lastSpawnTimeRef.current = now;
       
       // Add new item(s)
       const numItemsToSpawn = isAtCity ? 
-        Math.floor(Math.random() * 2) + 1 : // 1-2 items in cities
+        Math.floor(Math.random() * 3) + 1 : // 1-3 items in cities
         1; // Always just 1 item over land
       
       const newItems: DeliveryItem[] = [];
       
       for (let i = 0; i < numItemsToSpawn; i++) {
-        // Determine type
-        const isBasket = Math.random() > (isAtCity ? 0.7 : 0.85);
-        const type = isBasket ? 'basket' : 'egg';
+        // Determine type based on location and randomness
+        let type: DeliveryItem['type'];
+        
+        if (isAtCity) {
+          // Cities get more varied items
+          const itemTypeRoll = Math.random();
+          if (itemTypeRoll > 0.65) {
+            type = 'basket';
+          } else if (itemTypeRoll > 0.35) {
+            type = 'candy';
+          } else {
+            type = 'egg';
+          }
+        } else {
+          // Over regular land - simpler distribution
+          const itemTypeRoll = Math.random();
+          if (itemTypeRoll > 0.8) {
+            type = 'basket';
+          } else if (itemTypeRoll > 0.5) {
+            type = 'candy';
+          } else {
+            type = 'egg';
+          }
+        }
         
         // Calculate radial position
         const angle = Math.random() * Math.PI * 2;
-        const size = type === 'egg' ? 28 : 36;
         
-        // Pick a color
-        const colors = ['#FF9E80', '#FFCC80', '#FFE57F', '#CCFF90', '#80D8FF', '#CF93D9'];
+        // Set size based on item type
+        let size: number;
+        switch (type) {
+          case 'egg':
+            size = 28;
+            break;
+          case 'basket':
+            size = 36;
+            break;
+          case 'candy':
+            size = 26;
+            break;
+          default:
+            size = 28;
+        }
+        
+        // Pick a color - different palettes for different items
+        const colorPalettes = {
+          egg: ['#FF9E80', '#FFCC80', '#FFE57F', '#CCFF90', '#80D8FF', '#CF93D9'],
+          basket: ['#FFCC80', '#FFFDE7', '#F8BBD0', '#C5CAE9', '#B2DFDB'],
+          candy: ['#F48FB1', '#EC407A', '#E91E63', '#D81B60', '#F06292']
+        };
+        
+        // Use the right palette based on item type, or fallback to eggs
+        const paletteKey = colorPalettes[type] ? type : 'egg';
+        const colors = colorPalettes[paletteKey as keyof typeof colorPalettes];
         const color = colors[Math.floor(Math.random() * colors.length)];
         
         // Create new item
@@ -111,7 +197,7 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
     }
     
     // Animation frame update all items
-    const itemLifetime = 8000; // 8 seconds total lifetime
+    const itemLifetime = 6000; // 6 seconds total lifetime (was 8 seconds)
     
     // Animation loop
     const animationFrame = requestAnimationFrame(() => {
@@ -137,7 +223,7 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
               ...item,
               opacity: 0.95,
               scale: 1.1 - (progress * 0.15), // Shrink slightly to 0.95
-              distance: 30 + (progress * 30), // Move outward
+              distance: 30 + (progress * 45), // Move outward faster and further
             };
           }
           // Phase 3: Fade Out (70-100% of lifetime)
@@ -147,7 +233,7 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
               ...item,
               opacity: 0.95 * (1 - progress), // Fade to 0
               scale: 0.95 - (progress * 0.15), // Continue shrinking
-              distance: 60 + (progress * 10), // Continue moving
+              distance: 75 + (progress * 15), // Continue moving further
             };
           }
           // Ready for removal
@@ -182,7 +268,7 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
             width: ${item.size}px;
             height: ${item.size}px;
             background-color: ${item.color};
-            border-radius: ${item.type === 'egg' ? '50%' : '30%'};
+            border-radius: ${getItemBorderRadius(item.type)};
             border: 2px solid white;
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
             z-index: 99;
@@ -196,8 +282,8 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
                                  ${Math.sin(item.angle) * item.distance}px) 
                        scale(${item.scale});
           ">
-            <div style="font-size: ${item.type === 'egg' ? '16px' : '20px'}; font-weight: bold;">
-              ${item.type === 'egg' ? '🥚' : '🧺'}
+            <div style="font-size: ${getItemFontSize(item.type)}px; font-weight: bold;">
+              ${getItemEmoji(item.type)}
             </div>
           </div>
         `).join('')}
