@@ -55,6 +55,8 @@ npm install
 npm run dev
 ```
 
+See [LANDMASS_MODULE.md](LANDMASS_MODULE.md) for information about the landmass detection module used in development vs. production.
+
 ### Testing with Mock Time
 
 For testing different times of day, you can use query parameters or environment variables to control the Easter Bunny's position:

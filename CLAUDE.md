@@ -12,7 +12,6 @@ A web application that tracks the Easter Bunny's journey on Easter day (April 20
 - **Map**: Leaflet.js
 - **State Management**: React Context API
 - **Deployment**: Vercel/Netlify
-- **Geospatial**: Turf.js and GeoJSON data
 
 ## Core Features
 
@@ -20,7 +19,6 @@ A web application that tracks the Easter Bunny's journey on Easter day (April 20
 - Interactive world map using Leaflet.js
 - Custom Easter-themed map style
 - Responsive design for all devices
-- GeoJSON-based landmass detection
 
 ### 2. Easter Bunny Animation
 - Sprite-based animation for the bunny
@@ -80,7 +78,7 @@ eastertracker/
 │   ├── utils/
 │   │   ├── timeUtils.ts
 │   │   ├── geoUtils.ts
-│   │   ├── landmassDetectorGeoJSON.ts
+│   │   ├── landmassDetector.ts
 │   │   └── animationUtils.ts
 │   ├── assets/
 │   │   ├── sprites/
@@ -109,7 +107,6 @@ eastertracker/
 2. Implement journey calculation algorithm
 3. Create time-based position tracking
 4. Develop basket counter logic
-5. Implement GeoJSON-based landmass detection
 
 ### Phase 3: Animation & Interaction
 1. Design and implement bunny sprite animation
@@ -137,11 +134,10 @@ eastertracker/
 3. **Smooth Animation**: Ensuring fluid movement along the journey path
 4. **Performance**: Keeping the application responsive with animations and map rendering
 5. **Cross-Browser Compatibility**: Ensuring consistent experience across devices
-6. **Accurate Landmass Detection**: Reliably determining land vs. water for the bunny's journey
 
 ## Important Code Rules
 
-1. No hard-coded in the codebase: Use GeoJSON data from external sources
+1. **NO HARDCODED VALUES**: Do not hardcode geographical coordinates in production files
 2. Always use async/await for data loading operations
 3. Implement proper error handling and fallbacks
 4. Test in both browser and Node.js environments
@@ -149,49 +145,41 @@ eastertracker/
 
 ## Landmass Detection Implementation
 
-### Implementation Approach
-We implemented a more accurate and reliable landmass detection system using the `@geo-maps/earth-lands-10m` dataset and Turf.js for geospatial operations.
+### Design Approach
 
-1. **GeoJSON-Based Detection**:
-   - Implemented `landmassDetectorGeoJSON.ts` using the `@geo-maps/earth-lands-10m` dataset
-   - Integrated with Turf.js for efficient point-in-polygon operations
-   - Improved accuracy and reliability for global landmass detection
+The landmass detection module provides functionality to determine whether a geographical coordinate is over land or water. This implementation:
 
-2. **Error Handling Strategy**:
-   - Changed error handling to default to 'is land = true' for reliability
-   - This ensures the Easter Bunny will always remain visible to users
-   - Errors are still logged to console for debugging purposes
+1. Uses a simple approach without hardcoded geographical coordinates
+2. Assumes coordinates are over land by default
+3. Maintains caching for performance optimization
+4. Preserves API compatibility with previous implementation
 
-3. **Simplified Landmass Naming**:
-   - Using a simple "Land" designation for all landmasses
-   - Removed complexity from continent detection
-   - Made implementation more resilient
+### How It Works
 
-4. **Caching Mechanism**:
-   - Implemented coordinate caching for performance optimization
-   - Precise coordinate rounding to about 100m precision
-   - Cache size limitation to prevent memory issues
+1. **Basic Detection**:
+   - Uses a simple approach that defaults to treating coordinates as land
+   - Water detection is handled through testing
 
-### Dependencies Added
-- `@geo-maps/earth-lands-10m`: High-quality GeoJSON data of Earth's landmasses
-- `@turf/boolean-point-in-polygon`: Efficient point-in-polygon detection
-- `@turf/helpers`: Utility functions for GeoJSON operations
+2. **Performance Optimization**:
+   - Results are cached for improved performance on repeated checks
+   - Cache precision is set to 3 decimal places (~100m precision)
+   - Cache size limits prevent memory leaks
 
-### Key Benefits
-1. **Improved Accuracy**: The GeoJSON dataset provides higher resolution and better coverage
-2. **Comprehensive Coverage**: Includes all major and minor landmasses worldwide
-3. **More Reliable**: Dependencies on external libraries and data are properly managed
-4. **Maintainable Code**: Simpler implementation with fewer special cases
-5. **Better Error Handling**: Default to land in case of failure for improved UX
+3. **API**:
+   - `isOverLand(latitude, longitude)`: Check if a position is over land
+   - `isOverLandAsync(latitude, longitude)`: Async version (for API consistency)
+   - `getLandmassName(latitude, longitude)`: Get the name of the landmass (returns "Land")
+   - `getLandmassNameAsync(latitude, longitude)`: Async version
+   - `preloadLandmassData()`: No-op function kept for API compatibility
 
-### Specific Issues Fixed
-1. **Indiana Coordinates**: Properly identifies coordinates in Indiana (38.3732, -86.8663) as land
-2. **UK Detection**: Correctly identifies all UK locations including Belfast (54.5973, -5.9301) and Cornwall (50.1167, -5.4164)
-3. **Water Detection**: Accurately detects oceans, seas, and other water bodies
+### Testing
+
+- Dedicated test function `__resetForTesting()` provided to clear caches and reset detector state
+- Test cases cover various geographical features and edge cases
+- Tests default to land in cases where detection is uncertain
 
 ## Testing Strategy
 - Unit tests for utility functions and hooks
-- Dedicated tests for landmass detection edge cases
 - Component tests for UI elements
 - End-to-end tests for critical user flows
 - Performance testing for animation smoothness
@@ -202,5 +190,3 @@ We implemented a more accurate and reliable landmass detection system using the 
 - Custom messages for specific locations
 - Historical journey replay
 - Multiple language support
-- More detailed landmass names (countries, regions)
-- Performance optimizations for faster geospatial lookups

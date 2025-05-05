@@ -44,3 +44,7 @@ dist-ssr
 .temp
 .tmp
 **/.claude/settings.local.json
+
+# Large data files
+public/data/*.geo.json
+public/data/*.json
