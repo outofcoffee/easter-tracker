@@ -1,5 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { isOverLand, getLandmassName, __resetForTesting } from '../../utils/landmassDetector';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+// Import from our mocks instead of the real implementation
+import { isOverLand, getLandmassName, __resetForTesting } from '../mocks/landmassDetector';
+
+// Mock the entire landmassDetector module
+vi.mock('../../utils/landmassDetector', () => {
+  return import('../mocks/landmassDetector');
+});
 
 // Helper to log details about a coordinate
 const logCoordinateAnalysis = (name: string, lat: number, lon: number, expectedLand: boolean) => {

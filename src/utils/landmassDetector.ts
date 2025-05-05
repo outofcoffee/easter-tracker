@@ -19,8 +19,8 @@ const GEOJSON_URL = '/data/map.geo.json'; // Path to the GeoJSON file
 
 // Cache initialization flag and data
 let dataInitialized = false;
-let geoJsonData: any = null;
-let dataFetchPromise: Promise<any> | null = null;
+let geoJsonData: GeoJSON.GeometryCollection | null = null;
+let dataFetchPromise: Promise<GeoJSON.GeometryCollection | void> | null = null;
 
 /**
  * Initialize the GeoJSON data (lazy loading)
@@ -51,7 +51,7 @@ const initializeData = async (): Promise<void> => {
     })
     .catch(error => {
       console.error('Error loading GeoJSON data:', error);
-      // Provide a minimal fallback for testing
+      // Provide a minimal fallback
       geoJsonData = { 
         type: "GeometryCollection", 
         geometries: [] 

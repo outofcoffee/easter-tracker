@@ -139,6 +139,14 @@ eastertracker/
 5. **Cross-Browser Compatibility**: Ensuring consistent experience across devices
 6. **Accurate Landmass Detection**: Reliably determining land vs. water for the bunny's journey
 
+## Important Code Rules
+
+1. No hard-coded in the codebase: Use GeoJSON data from external sources
+2. Always use async/await for data loading operations
+3. Implement proper error handling and fallbacks
+4. Test in both browser and Node.js environments
+5. Keep performance and memory usage in mind
+
 ## Landmass Detection Implementation
 
 ### Implementation Approach
