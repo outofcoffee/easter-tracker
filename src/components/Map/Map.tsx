@@ -4,6 +4,7 @@ import L from 'leaflet';
 import { useTracker } from '../../hooks/useTracker';
 import DeliveryBunny from '../BunnySprite/DeliveryBunny';
 import { DEFAULT_MAP_ZOOM } from '../../types';
+import logger from '../../utils/logger';
 import 'leaflet/dist/leaflet.css';
 
 // Add a class to the map container for targeting with CSS
@@ -42,15 +43,15 @@ const MapController = () => {
     map.setMaxZoom(MAX_ZOOM);
     
     // Log to confirm settings are applied
-    console.log(`Zoom constraints set: min=${map.getMinZoom()}, max=${map.getMaxZoom()}, current=${map.getZoom()}`);
+    logger.debug(`Zoom constraints set: min=${map.getMinZoom()}, max=${map.getMaxZoom()}, current=${map.getZoom()}`);
     
     // Handle any initial zoom adjustment if needed
     const currentZoom = map.getZoom();
     if (currentZoom < MIN_ZOOM) {
-      console.log("Initial zoom too low, adjusting to min zoom");
+      logger.debug("Initial zoom too low, adjusting to min zoom");
       map.setZoom(MIN_ZOOM);
     } else if (currentZoom > MAX_ZOOM) {
-      console.log("Initial zoom too high, adjusting to max zoom");
+      logger.debug("Initial zoom too high, adjusting to max zoom");
       map.setZoom(MAX_ZOOM);
     }
   }, [map]);
@@ -60,7 +61,7 @@ const MapController = () => {
     // Function to update the context with the current zoom level
     const updateZoomLevel = () => {
       const zoom = map.getZoom();
-      console.log("Zoom updated:", zoom);
+      logger.debug("Zoom updated:", zoom);
       setMapZoomLevel(zoom);
     };
     
@@ -99,11 +100,11 @@ const Map = () => {
   // Debug the delivery state  
   useEffect(() => {
     if (currentPosition) {
-      console.log('Current bunny position:', currentPosition);
-      console.log('Is delivering at city:', isDeliveringAtCity ? 'Yes' : 'No');
-      console.log('Is over land:', currentPosition.overLand ? 'Yes' : 'No');
-      console.log('Current city:', currentPosition.currentCity?.name);
-      console.log('Next city:', currentPosition.nextCity?.name);
+      logger.debug('Current bunny position:', currentPosition);
+      logger.debug('Is delivering at city:', isDeliveringAtCity ? 'Yes' : 'No');
+      logger.debug('Is over land:', currentPosition.overLand ? 'Yes' : 'No');
+      logger.debug('Current city:', currentPosition.currentCity?.name);
+      logger.debug('Next city:', currentPosition.nextCity?.name);
     }
   }, [currentPosition, isDeliveringAtCity]);
   

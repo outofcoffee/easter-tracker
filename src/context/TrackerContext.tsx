@@ -5,6 +5,7 @@ import { BunnyPosition, ViewerLocation, DEFAULT_MAP_ZOOM } from '../types';
 import { isEaster, getNextEasterDate, formatDate } from '../utils/timeUtils';
 import { TrackerContext } from './TrackerContextDefinition';
 import { preloadLandmassData } from '../utils/landmassDetector';
+import logger from '../utils/logger';
 
 interface TrackerProviderProps {
   children: ReactNode;
@@ -27,11 +28,11 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
   useEffect(() => {
     const preloadData = async () => {
       try {
-        console.log("Preloading GeoJSON data...");
+        logger.debug("Preloading GeoJSON data...");
         await preloadLandmassData();
-        console.log("GeoJSON data loaded successfully");
+        logger.debug("GeoJSON data loaded successfully");
       } catch (error) {
-        console.error("Failed to preload GeoJSON data:", error);
+        logger.error("Failed to preload GeoJSON data:", error);
       }
     };
 
@@ -114,13 +115,13 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
       isEasterDay;
     
     if (shouldRequestLocation) {
-      console.log(`Getting user location once during Easter period (isEasterDay: ${isEasterDay})`);
+      logger.debug(`Getting user location once during Easter period (isEasterDay: ${isEasterDay})`);
       
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
             const { latitude, longitude } = position.coords;
-            console.log("Got user location:", latitude, longitude);
+            logger.debug("Got user location:", latitude, longitude);
             
             // Import getUserNearestCity directly to avoid circular imports
             const { getUserNearestCity } = await import('../utils/geoUtils');
@@ -139,16 +140,16 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
               setEstimatedArrivalTime(arrivalTime);
             }
           } catch (error) {
-            console.error("Error processing location:", error);
+            logger.error("Error processing location:", error);
           }
         },
         (error) => {
-          console.error('Error getting location:', error.message);
+          logger.error('Error getting location:', error.message);
           
           // Try once more after a delay (user might have dismissed the prompt)
           setTimeout(() => {
             if (!viewerLocation && isEasterDay) {
-              console.log("Retrying geolocation once...");
+              logger.debug("Retrying geolocation once...");
               navigator.geolocation.getCurrentPosition(
                 async (position) => {
                   const { latitude, longitude } = position.coords;
@@ -167,7 +168,7 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
                   }
                 },
                 (retryError) => {
-                  console.error('Retry failed:', retryError.message);
+                  logger.error('Retry failed:', retryError.message);
                 },
                 { timeout: 10000, maximumAge: 0 }
               );

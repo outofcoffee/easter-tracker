@@ -5,6 +5,7 @@ import {
   isOverLand, 
   getLandmassName 
 } from './landmassDetector';
+import logger from './logger';
 
 // Calculate distance between two points using Haversine formula
 export const calculateDistance = (
@@ -274,8 +275,8 @@ export const calculateCurrentPosition = async (mapZoomLevel?: number): Promise<B
     
     // Debug land detection
     const landmassName = getLandmassName(latitude, longitude);
-    console.log(`Bunny position: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-    console.log(`Landmass detection: ${overLand ? 'YES' : 'NO'}, name: ${landmassName || 'NONE'}`);
+    logger.debug(`Bunny position: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+    logger.debug(`Landmass detection: ${overLand ? 'YES' : 'NO'}, name: ${landmassName || 'NONE'}`);
     
     // If bunny is over water during travel, try to find a nearby land point
     if (!overLand && currentIndex !== nextIndex) {
@@ -283,7 +284,7 @@ export const calculateCurrentPosition = async (mapZoomLevel?: number): Promise<B
       if (nearbyLandPosition) {
         latitude = nearbyLandPosition.latitude;
         longitude = nearbyLandPosition.longitude;
-        console.log(`Adjusted to nearby land: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+        logger.debug(`Adjusted to nearby land: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
       }
     }
 
@@ -301,7 +302,7 @@ export const calculateCurrentPosition = async (mapZoomLevel?: number): Promise<B
       overLand
     };
   } catch (error) {
-    console.error('Error calculating bunny position:', error);
+    logger.error('Error calculating bunny position:', error);
     return null;
   }
 };
@@ -315,7 +316,7 @@ export const getUserNearestCity = async (
     const cities = await getCities();
     return getNearestCity(latitude, longitude, cities);
   } catch (error) {
-    console.error('Error finding nearest city:', error);
+    logger.error('Error finding nearest city:', error);
     return null;
   }
 };

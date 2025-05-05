@@ -10,6 +10,7 @@
 // Import dependencies
 import * as booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
+import logger from './logger';
 
 // We'll use a Map for caching results
 const landCheckCache: Map<string, boolean> = new Map();
@@ -49,10 +50,10 @@ const initializeData = async (): Promise<void> => {
     .then(data => {
       geoJsonData = data;
       dataInitialized = true;
-      console.log('GeoJSON data loaded successfully');
+      logger.debug('GeoJSON data loaded successfully');
     })
     .catch(error => {
-      console.error('Error loading GeoJSON data:', error);
+      logger.error('Error loading GeoJSON data:', error);
       // Provide a minimal fallback
       geoJsonData = { 
         type: "GeometryCollection", 
@@ -99,7 +100,7 @@ export const isOverLand = (latitude: number, longitude: number): boolean => {
   // The async version should be used for initial loading
   if (!dataInitialized) {
     // Start the initialization process but don't wait for it
-    initializeData().catch(err => console.error('Error initializing data:', err));
+    initializeData().catch(err => logger.error('Error initializing data:', err));
     // Return true (land) as a safe default
     landCheckCache.set(cacheKey, true);
     return true;
@@ -148,7 +149,7 @@ export const isOverLand = (latitude: number, longitude: number): boolean => {
     
     return isLand;
   } catch (error) {
-    console.error('Error in isOverLand:', error);
+    logger.error('Error in isOverLand:', error);
     // Default to land in case of error
     landCheckCache.set(cacheKey, true);
     return true;

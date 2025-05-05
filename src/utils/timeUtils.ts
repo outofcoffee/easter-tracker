@@ -1,3 +1,5 @@
+import logger from './logger';
+
 // Format time to display in a user-friendly way
 export const formatTime = (date: Date): string => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -105,21 +107,21 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
         if (!isNaN(mockTime.getTime())) {
           // Only log once when the app starts
           if (!getCurrentTime.hasLoggedMockTime) {
-            console.log(`Using mock time: ${mockTime.toISOString()}`);
+            logger.info(`Using mock time: ${mockTime.toISOString()}`);
             getCurrentTime.hasLoggedMockTime = true;
           }
           return mockTime;
         } else {
           // Only log error once
           if (!getCurrentTime.hasLoggedError) {
-            console.error(`Invalid mock time format: ${mockTimeString}, using real time instead`);
+            logger.error(`Invalid mock time format: ${mockTimeString}, using real time instead`);
             getCurrentTime.hasLoggedError = true;
           }
         }
       } catch (error) {
         // Only log error once
         if (!getCurrentTime.hasLoggedError) {
-          console.error(`Error parsing mock time: ${error}`);
+          logger.error(`Error parsing mock time: ${error}`);
           getCurrentTime.hasLoggedError = true;
         }
       }
@@ -148,21 +150,21 @@ export const getCurrentTime = ((): GetCurrentTimeFunction => {
           
           // Only log once when the app starts
           if (!getCurrentTime.hasLoggedMockDate) {
-            console.log(`Using mock date with real time: ${hybridTime.toISOString()}`);
+            logger.info(`Using mock date with real time: ${hybridTime.toISOString()}`);
             getCurrentTime.hasLoggedMockDate = true;
           }
           return hybridTime;
         } else {
           // Only log error once
           if (!getCurrentTime.hasLoggedError) {
-            console.error(`Invalid mock date format: ${mockDateString}, using real date instead`);
+            logger.error(`Invalid mock date format: ${mockDateString}, using real date instead`);
             getCurrentTime.hasLoggedError = true;
           }
         }
       } catch (error) {
         // Only log error once
         if (!getCurrentTime.hasLoggedError) {
-          console.error(`Error parsing mock date: ${error}`);
+          logger.error(`Error parsing mock date: ${error}`);
           getCurrentTime.hasLoggedError = true;
         }
       }
@@ -337,7 +339,7 @@ export const calculateIdealArrivalTime = (city: { timezone: string }, easterDate
     timezoneOffsetMinutes = sign * (hours * 60 + minutes);
   } else {
     // If we can't parse, assume UTC
-    console.warn(`Could not parse timezone: ${city.timezone}, defaulting to UTC`);
+    logger.warn(`Could not parse timezone: ${city.timezone}, defaulting to UTC`);
   }
   
   // Get the Easter date and set it to local midnight

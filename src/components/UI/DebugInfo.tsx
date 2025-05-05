@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getCurrentTime, getGlobalEasterStart, getGlobalEasterEnd, getEasterDate } from '../../utils/timeUtils';
 import { useTracker } from '../../hooks/useTracker';
+import logger from '../../utils/logger';
 
 const DebugInfo = () => {
   const { isEasterDay, nextEasterFormatted, currentPosition } = useTracker();
@@ -19,9 +20,18 @@ const DebugInfo = () => {
   // Check if debug mode is enabled via environment variable
   useEffect(() => {
     try {
-      // @ts-expect-error - Accessing Vite environment variables which may be undefined at compile time
-      const isDebug = import.meta.env?.VITE_DEBUG === 'true';
-      setShowDebug(isDebug);
+      // Check for debug mode from multiple sources
+      const isViteDebug = import.meta.env.VITE_DEBUG === 'true';
+      const isDev = import.meta.env.DEV === true;
+      const hasDebugParam = new URLSearchParams(window.location.search).get('debug') === 'true';
+      
+      // Show debug panel if any debug condition is true
+      setShowDebug(isViteDebug || isDev || hasDebugParam);
+      
+      // Log debug mode status
+      if (isViteDebug || isDev || hasDebugParam) {
+        logger.debug('Debug panel initialized');
+      }
     } catch (e) {
       setShowDebug(false);
     }

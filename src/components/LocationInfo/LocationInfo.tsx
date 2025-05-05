@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../../hooks/useTracker';
 import { getCurrentTime, formatTime } from '../../utils/timeUtils';
+import logger from '../../utils/logger';
 
 const LocationInfo = () => {
   const { viewerLocation, estimatedArrivalTime, isNearby, isEasterDay } = useTracker();
@@ -24,7 +25,7 @@ const LocationInfo = () => {
         }
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
-          console.debug('Error checking permission status');
+          logger.debug('Error checking permission status');
         }
       }
     };

@@ -29,7 +29,6 @@ export default defineConfig({
       '@geo-maps/earth-lands-1km/map.geo.json': 'empty-module.js'
     }
   },
-  define: {
-    'import.meta.env': JSON.stringify(process.env)
-  }
+  // Don't override Vite's environment variable handling
+  // Let Vite handle VITE_* prefixed env variables automatically
 })
