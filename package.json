@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@geo-maps/earth-lands-10m": "^0.6.0",
+    "@geo-maps/earth-lands-1km": "^0.6.0",
     "@turf/boolean-point-in-polygon": "^7.2.0",
     "@turf/helpers": "^7.2.0",
     "leaflet": "^1.9.4",

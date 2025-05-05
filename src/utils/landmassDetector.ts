@@ -3,6 +3,8 @@
  * 
  * This implementation fetches the GeoJSON data at runtime
  * and uses the Turf.js library for GeoJSON operations.
+ * 
+ * Uses the @geo-maps/earth-lands-1km dataset (smaller file, ~20MB) for better performance.
  */
 
 // Import dependencies
