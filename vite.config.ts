@@ -16,7 +16,18 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      // Avoid bundling modules that are loaded at runtime
+      external: ['@geo-maps/earth-lands-10m', '@geo-maps/earth-lands-10m/map.geo.json']
+    }
+  },
+  resolve: {
+    // Tell Vite not to try to resolve the GeoJSON module during bundling
+    alias: {
+      '@geo-maps/earth-lands-10m': 'empty-module.js',
+      '@geo-maps/earth-lands-10m/map.geo.json': 'empty-module.js'
+    }
   },
   define: {
     'import.meta.env': JSON.stringify(process.env)

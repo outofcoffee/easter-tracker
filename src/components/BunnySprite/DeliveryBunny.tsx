@@ -42,10 +42,10 @@ const DeliveryBunny: React.FC<{ position: [number, number] }> = ({ position }) =
                      currentPosition.currentCity.id === currentPosition.nextCity.id;
       
       // Whether we should be showing delivery items
-      const shouldDeliver = atCity || currentPosition.overLand;
+      const shouldDeliver = atCity || (currentPosition.overLand ?? true);
       
-      setIsAtCity(atCity);
-      setIsDelivering(shouldDeliver);
+      setIsAtCity(!!atCity);
+      setIsDelivering(!!shouldDeliver);
     }
   }, [currentPosition]);
   

@@ -1,7 +1,10 @@
 import { City, BunnyPosition, DEFAULT_MAP_ZOOM } from '../types';
 import { getCities } from '../data/cities';
 // Import the GeoJSON-based land detector for more accurate landmass detection
-import { isOverLand, getLandmassName } from './landmassDetector';
+import { 
+  isOverLand, 
+  getLandmassName 
+} from './landmassDetector';
 
 // Calculate distance between two points using Haversine formula
 export const calculateDistance = (

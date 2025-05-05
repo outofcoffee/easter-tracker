@@ -4,6 +4,7 @@ import { calculateBasketsDelivered } from '../utils/basketCalculator';
 import { BunnyPosition, ViewerLocation, DEFAULT_MAP_ZOOM } from '../types';
 import { isEaster, getNextEasterDate, formatDate } from '../utils/timeUtils';
 import { TrackerContext } from './TrackerContextDefinition';
+import { preloadLandmassData } from '../utils/landmassDetector';
 
 interface TrackerProviderProps {
   children: ReactNode;
@@ -21,6 +22,21 @@ export const TrackerProvider = ({ children }: TrackerProviderProps) => {
   const [nextEasterDate, setNextEasterDate] = useState(getNextEasterDate());
   const [nextEasterFormatted, setNextEasterFormatted] = useState(formatDate(getNextEasterDate()));
   const [mapZoomLevel, setMapZoomLevel] = useState(DEFAULT_MAP_ZOOM); // Default zoom level
+
+  // Preload the GeoJSON data at component mount
+  useEffect(() => {
+    const preloadData = async () => {
+      try {
+        console.log("Preloading GeoJSON data...");
+        await preloadLandmassData();
+        console.log("GeoJSON data loaded successfully");
+      } catch (error) {
+        console.error("Failed to preload GeoJSON data:", error);
+      }
+    };
+
+    preloadData();
+  }, []);
 
   // Check if it's Easter Day and update relevant information
   useEffect(() => {
