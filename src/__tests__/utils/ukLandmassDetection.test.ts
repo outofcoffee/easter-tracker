@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { isOverLand, getLandmassName, __resetForTesting } from '../../utils/landmassDetectorGeoJSON';
+import { isOverLand, getLandmassName, __resetForTesting } from '../../utils/landmassDetector';
 
 // Helper to log details about a coordinate
 const logCoordinateAnalysis = (name: string, lat: number, lon: number, expectedLand: boolean) => {
