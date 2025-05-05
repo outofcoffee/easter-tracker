@@ -21,9 +21,13 @@ L.Icon.Default.mergeOptions({
 const MapController = () => {
   const { currentPosition, setMapZoomLevel } = useTracker();
   const map = useMap();
+  const MIN_ZOOM = 3;
+  const MAX_ZOOM = 8;
   
+  // Track when the bunny moves and update map view
   useEffect(() => {
     if (currentPosition) {
+      // Move view to follow the bunny with current zoom level
       map.setView(
         [currentPosition.latitude, currentPosition.longitude],
         map.getZoom()
@@ -31,21 +35,44 @@ const MapController = () => {
     }
   }, [currentPosition, map]);
   
-  // Track zoom level changes
+  // Set up zoom constraints the proper way
   useEffect(() => {
-    // Update context with initial zoom level
-    setMapZoomLevel(map.getZoom());
+    // According to Leaflet docs, this is the proper way to set min/max zoom
+    map.setMinZoom(MIN_ZOOM);
+    map.setMaxZoom(MAX_ZOOM);
     
-    // Add event listener for zoom changes
-    const handleZoomChange = () => {
-      setMapZoomLevel(map.getZoom());
+    // Log to confirm settings are applied
+    console.log(`Zoom constraints set: min=${map.getMinZoom()}, max=${map.getMaxZoom()}, current=${map.getZoom()}`);
+    
+    // Handle any initial zoom adjustment if needed
+    const currentZoom = map.getZoom();
+    if (currentZoom < MIN_ZOOM) {
+      console.log("Initial zoom too low, adjusting to min zoom");
+      map.setZoom(MIN_ZOOM);
+    } else if (currentZoom > MAX_ZOOM) {
+      console.log("Initial zoom too high, adjusting to max zoom");
+      map.setZoom(MAX_ZOOM);
+    }
+  }, [map]);
+  
+  // Keep the tracker context updated with the current zoom level
+  useEffect(() => {
+    // Function to update the context with the current zoom level
+    const updateZoomLevel = () => {
+      const zoom = map.getZoom();
+      console.log("Zoom updated:", zoom);
+      setMapZoomLevel(zoom);
     };
     
-    map.on('zoom', handleZoomChange);
+    // Set initial zoom level in context
+    updateZoomLevel();
     
-    // Cleanup event listener
+    // Listen for zoom changes
+    map.on('zoomend', updateZoomLevel);
+    
+    // Cleanup
     return () => {
-      map.off('zoom', handleZoomChange);
+      map.off('zoomend', updateZoomLevel);
     };
   }, [map, setMapZoomLevel]);
   
@@ -60,6 +87,8 @@ const Map = () => {
   // Default position (middle of the world)
   const defaultPosition: [number, number] = [0, 0];
   const defaultZoom = DEFAULT_MAP_ZOOM;
+  const MIN_ZOOM = 3;
+  const MAX_ZOOM = 8;
   
   // Function to determine if the bunny is delivering at a city
   const isDeliveringAtCity = currentPosition && 
@@ -94,6 +123,9 @@ const Map = () => {
           ? [currentPosition.latitude, currentPosition.longitude] 
           : defaultPosition}
         zoom={defaultZoom}
+        minZoom={MIN_ZOOM}
+        maxZoom={MAX_ZOOM}
+        zoomControl={true}
         className="easter-map"
         style={{ height: '100%', width: '100%' }}
       >
@@ -101,6 +133,8 @@ const Map = () => {
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          minZoom={MIN_ZOOM}
+          maxZoom={MAX_ZOOM}
         />
         
         {/* Easter Bunny Marker with delivery items */}
